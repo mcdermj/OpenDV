@@ -1,3 +1,15 @@
+dstarrepeater (1.20160404-2) jessie; urgency=medium
+
+  * Nightly OpenDV Build for 20160404
+
+ -- Jeremy McDermond <nh6z@nh6z.net>  Mon, 04 Apr 2016 04:08:52 +0000
+
+dstarrepeater (1.20160404-1) jessie; urgency=medium
+
+  * Nightly OpenDV Build for 20160404
+
+ -- root <root@commune.xenotropic.com>  Mon, 04 Apr 2016 03:57:40 +0000
+
 dstarrepeater (1.20160314-1) unstable; urgency=low
 
   * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
