@@ -16,6 +16,8 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <wx/socket.h>
+
 #include "UDPReaderWriter.h"
 
 #if !defined(__WINDOWS__)
@@ -96,23 +98,19 @@ bool CUDPReaderWriter::open()
 		return false;
 	}
 
-	if (m_port > 0U) {
-		sockaddr_in addr;
-		::memset(&addr, 0x00, sizeof(sockaddr_in));
-		addr.sin_family      = AF_INET;
-		addr.sin_port        = htons(m_port);
-		addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-		if (!m_address.IsEmpty()) {
-#if defined(__WINDOWS__)
-			addr.sin_addr.s_addr = ::inet_addr(m_address.mb_str());
-#else
-			addr.sin_addr.s_addr = ::inet_addr(m_address.mb_str());
-#endif
-			if (addr.sin_addr.s_addr == INADDR_NONE) {
-				wxLogError(wxT("The address is invalid - %s"), m_address.c_str());
-				return false;
-			}
+	if (m_port > 0U) {
+		//  XXX We could probably create the wxIPV4Address and keep it
+		//  XXX around as the storage of local address/port
+		wxIPV4address myAddress;
+		if(!myAddress.Hostname(m_address)) {
+			wxLogError("Local address is invalid");
+			return false;
+		}
+
+		if(!myAddress.Service(m_port)) {
+			wxLogError("Local port is invalid");
+			return false;
 		}
 
 		int reuse = 1;
@@ -125,7 +123,8 @@ bool CUDPReaderWriter::open()
 			return false;
 		}
 
-		if (::bind(m_fd, (sockaddr*)&addr, sizeof(sockaddr_in)) == -1) {
+		if (::bind(m_fd, myAddress.GetAddressData(),
+		    myAddress.GetAddressDataLen()) == -1) {
 #if defined(__WINDOWS__)
 			wxLogError(wxT("Cannot bind the UDP address (port: %u), err: %lu"), m_port, ::GetLastError());
 #else
