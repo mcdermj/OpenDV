@@ -19,6 +19,10 @@
 #ifndef	SplitController_H
 #define	SplitController_H
 
+#include <wx/wx.h>
+#include <wx/socket.h>
+#include <wx/dynarray.h>
+
 #include "GatewayProtocolHandler.h"
 #include "DStarDefines.h"
 #include "RingBuffer.h"
@@ -26,7 +30,7 @@
 #include "Modem.h"
 #include "Utils.h"
 
-#include <wx/wx.h>
+WX_DECLARE_OBJARRAY(wxIPV4address, wxIPV4addressArray);
 
 class CAMBESlot {
 public:
@@ -51,7 +55,7 @@ private:
 
 class CSplitController : public CModem {
 public:
-	CSplitController(const wxString& localAddress, unsigned int localPort, const wxArrayString& transmitterNames, const wxArrayString& receiverNames, unsigned int timeout);
+	CSplitController(const wxIPV4address& localAddress, const wxArrayString& transmitterNames, const wxArrayString& receiverNames, unsigned int timeout);
 	virtual ~CSplitController();
 
 	virtual void* Entry();
@@ -71,12 +75,15 @@ private:
 	unsigned int               m_timeout;
 	unsigned int               m_txCount;
 	unsigned int               m_rxCount;
-	in_addr*                   m_txAddresses;
-	unsigned int*              m_txPorts;
+
+	wxIPV4addressArray         m_txAddresses;
+
 	CTimer**                   m_txTimers;
-	in_addr*                   m_rxAddresses;
-	unsigned int*              m_rxPorts;
+
+	wxIPV4addressArray	   m_rxAddresses;
+
 	CTimer**                   m_rxTimers;
+
 	CRingBuffer<unsigned char> m_txData;
 	wxUint16                   m_outId;
 	wxUint8                    m_outSeq;

@@ -16,6 +16,8 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <wx/socket.h>
+
 #include "GatewayProtocolHandler.h"
 #include "CCITTChecksumReverse.h"
 #include "DStarDefines.h"
@@ -25,16 +27,15 @@
 
 const unsigned int BUFFER_LENGTH = 255U;
 
-CGatewayProtocolHandler::CGatewayProtocolHandler(const wxString& localAddress, unsigned int localPort) :
-m_socket(localAddress, localPort),
+CGatewayProtocolHandler::CGatewayProtocolHandler(const wxIPV4address &localAddress) :
+m_socket(localAddress),
 m_type(NETWORK_NONE),
 m_buffer(NULL),
 m_length(0U)
 {
 	m_buffer = new unsigned char[BUFFER_LENGTH];
 
-	wxDateTime now = wxDateTime::UNow();
-	::srand(now.GetMillisecond());
+	::srand(wxDateTime::UNow().GetMillisecond());
 }
 
 CGatewayProtocolHandler::~CGatewayProtocolHandler()
@@ -42,12 +43,7 @@ CGatewayProtocolHandler::~CGatewayProtocolHandler()
 	delete[] m_buffer;
 }
 
-bool CGatewayProtocolHandler::open()
-{
-	return m_socket.open();
-}
-
-bool CGatewayProtocolHandler::writeHeader(const unsigned char* header, wxUint16 id, const in_addr& address, unsigned int port)
+bool CGatewayProtocolHandler::writeHeader(const unsigned char* header, wxUint16 id, const wxIPV4address &address)
 {
 	unsigned char buffer[50U];
 
@@ -75,15 +71,15 @@ bool CGatewayProtocolHandler::writeHeader(const unsigned char* header, wxUint16 
 #endif
 
 	for (unsigned int i = 0U; i < 4U; i++) {
-		bool ret = m_socket.write(buffer, 49U, address, port);
-		if (!ret)
+		m_socket.SendTo(address, buffer, 49);
+		if(m_socket.Error())
 			return false;
 	}
 
 	return true;
 }
 
-bool CGatewayProtocolHandler::writeData(const unsigned char* data, unsigned int length, wxUint16 id, wxUint8 seqNo, const in_addr& address, unsigned int port)
+bool CGatewayProtocolHandler::writeData(const unsigned char* data, unsigned int length, wxUint16 id, wxUint8 seqNo, const wxIPV4address &address)
 {
 	wxASSERT(data != NULL);
 	wxASSERT(length == DV_FRAME_LENGTH_BYTES || length == DV_FRAME_MAX_LENGTH_BYTES);
@@ -110,30 +106,29 @@ bool CGatewayProtocolHandler::writeData(const unsigned char* data, unsigned int 
 	CUtils::dump(wxT("Sending Data"), buffer, length + 9U);
 #endif
 
-	return m_socket.write(buffer, length + 9U, address, port);
+	m_socket.SendTo(address, buffer, length + 9);
+	return m_socket.Error();
 }
 
-NETWORK_TYPE CGatewayProtocolHandler::read(wxUint16& id, in_addr& address, unsigned int& port)
+NETWORK_TYPE CGatewayProtocolHandler::read(wxUint16& id, wxIPV4address &address)
 {
 	bool res = true;
 
 	// Loop until we have no more data from the socket or we have data for the higher layers
 	while (res)
-		res = readPackets(id, address, port);
+		res = readPackets(id, address);
 
 	return m_type;
 }
 
-bool CGatewayProtocolHandler::readPackets(wxUint16& id, in_addr& address, unsigned int& port)
+bool CGatewayProtocolHandler::readPackets(wxUint16& id, wxIPV4address &address)
 {
 	m_type = NETWORK_NONE;
 
-	// No more data?
-	int length = m_socket.read(m_buffer, BUFFER_LENGTH, address, port);
-	if (length <= 0)
+	m_socket.RecvFrom(address, m_buffer, BUFFER_LENGTH);
+	m_length = m_socket.LastReadCount();
+	if (m_length <= 0)
 		return false;
-
-	m_length = length;
 
 	// Invalid packet type?
 	if (m_buffer[0] == 'D' && m_buffer[1] == 'S' && m_buffer[2] == 'R' && m_buffer[3] == 'P') {
@@ -230,9 +225,4 @@ unsigned int CGatewayProtocolHandler::readRegister(wxString& name)
 	name = wxString((char*)(m_buffer + 5U), wxConvLocal);
 
 	return m_length - 6U;
-}
-
-void CGatewayProtocolHandler::close()
-{
-	m_socket.close();
 }

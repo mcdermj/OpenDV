@@ -525,12 +525,13 @@ void CDStarRepeaterApp::createThread()
 		wxLogInfo("MMDVM, port: %s, RX invert: %d, TX invert: %d, PTT invert: %d, TX delay: %u ms, RX level: %u%%, TX level: %u%%", port.c_str(), int(rxInvert), int(txInvert), int(pttInvert), txDelay, rxLevel, txLevel);
 		modem = new CMMDVMController(port, wxEmptyString, rxInvert, txInvert, pttInvert, txDelay, rxLevel, txLevel);
 	} else if (modemType.IsSameAs("Split")) {
-		wxString localAddress;
+		wxString localAddressName;
 		unsigned int localPort;
 		wxArrayString transmitterNames, receiverNames;
 		unsigned int timeout;
-		m_config->getSplit(localAddress, localPort, transmitterNames, receiverNames, timeout);
-		wxLogInfo("Split, local: %s:%u, timeout: %u ms", localAddress.c_str(), localPort, timeout);
+
+		m_config->getSplit(localAddressName, localPort, transmitterNames, receiverNames, timeout);
+		wxLogInfo("Split, local: %s:%u, timeout: %u ms", localAddressName, localPort, timeout);
 		for (unsigned int i = 0U; i < transmitterNames.GetCount(); i++) {
 			wxString name = transmitterNames.Item(i);
 			if (!name.IsEmpty())
@@ -541,7 +542,13 @@ void CDStarRepeaterApp::createThread()
 			if (!name.IsEmpty())
 				wxLogInfo("\tRX %u name: %s", i + 1U, name.c_str());
 		}
-		modem = new CSplitController(localAddress, localPort, transmitterNames, receiverNames, timeout);
+		wxIPV4address localAddress;
+
+		//  XXX These need to be error checked.
+		localAddress.Hostname(localAddressName);
+		localAddress.Service(localPort);
+
+		modem = new CSplitController(localAddress, transmitterNames, receiverNames, timeout);
 	} else {
 		wxLogError("Unknown modem type: %s", modemType.c_str());
 	}
@@ -568,9 +575,9 @@ void CDStarRepeaterApp::createThread()
 		port.ToULong(&num);
 		controller = new CExternalController(new CK8055Controller(num), pttInvert);
 	} else if (controllerType.StartsWith("URI USB - ", &port)) {
-                unsigned long num;
-                port.ToULong(&num);
-                controller = new CExternalController(new CURIUSBController(num, true), pttInvert);
+		unsigned long num;
+		port.ToULong(&num);
+		controller = new CExternalController(new CURIUSBController(num, true), pttInvert);
 	} else if (controllerType.StartsWith("Serial - ", &port)) {
 		controller = new CExternalController(new CSerialLineController(port, portConfig), pttInvert);
 	} else if (controllerType.StartsWith("Arduino - ", &port)) {

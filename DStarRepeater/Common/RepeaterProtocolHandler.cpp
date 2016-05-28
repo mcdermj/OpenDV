@@ -315,7 +315,8 @@ bool CRepeaterProtocolHandler::readPackets()
 	if (m_length <= 0)
 		return false;
 
-	if(remoteAddress != m_gatewayAddress) {
+	//  XXX This is a little hinky.  wxWidgets doesn't properly overload !=
+	if(!(remoteAddress == m_gatewayAddress)) {
 		wxLogMessage(wxT("Packet received from an invalid source, %s != %s and/or %u != %u"),
 			m_gatewayAddress.IPAddress(), remoteAddress.IPAddress(),
 			m_gatewayAddress.Service(), remoteAddress.Service());
