@@ -43,7 +43,6 @@ m_registerTimer(1000U),
 m_rptState(DSRS_LISTENING),
 m_rxState(DSRXS_LISTENING),
 m_slowDataDecoder(),
-m_killed(false),
 m_ambe(),
 m_ambeFrames(0U),
 m_ambeSilence(0U),
@@ -63,10 +62,10 @@ CDStarRepeaterRXThread::~CDStarRepeaterRXThread()
 void *CDStarRepeaterRXThread::Entry()
 {
 	// Wait here until we have the essentials to run
-	while (!m_killed && (m_modem == NULL  || m_protocolHandler == NULL))
+	while (!TestDestroy() && (m_modem == NULL  || m_protocolHandler == NULL))
 		::wxMilliSleep(500UL);		// 1/2 sec
 
-	if (m_killed)
+	if (TestDestroy())
 		return NULL;
 
 	m_registerTimer.start(10U);
@@ -81,7 +80,7 @@ void *CDStarRepeaterRXThread::Entry()
 	wxStopWatch stopWatch;
 
 	try {
-		while (!m_killed) {
+		while (!TestDestroy()) {
 			stopWatch.Start();
 
 			receiveModem();
@@ -119,11 +118,6 @@ void *CDStarRepeaterRXThread::Entry()
 	delete m_protocolHandler;
 
 	return NULL;
-}
-
-void CDStarRepeaterRXThread::kill()
-{
-	m_killed = true;
 }
 
 void CDStarRepeaterRXThread::setCallsign(const wxString&, const wxString&, DSTAR_MODE, ACK_TYPE, bool, bool, bool, bool)

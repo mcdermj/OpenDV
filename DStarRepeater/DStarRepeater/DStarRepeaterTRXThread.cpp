@@ -79,7 +79,6 @@ m_status4Encoder(),
 m_status5Encoder(),
 m_tx(false),
 m_space(0U),
-m_killed(false),
 m_mode(MODE_DUPLEX),
 m_ack(AT_BER),
 m_restriction(false),
@@ -147,10 +146,10 @@ CDStarRepeaterTRXThread::~CDStarRepeaterTRXThread()
 void *CDStarRepeaterTRXThread::Entry()
 {
 	// Wait here until we have the essentials to run
-	while (!m_killed && (m_modem == NULL || m_controller == NULL || m_rptCallsign.IsEmpty() || m_rptCallsign.IsSameAs(wxT("        "))))
+	while (!TestDestroy() && (m_modem == NULL || m_controller == NULL || m_rptCallsign.IsEmpty() || m_rptCallsign.IsSameAs(wxT("        "))))
 		::wxMilliSleep(500UL);		// 1/2 sec
 
-	if (m_killed)
+	if (TestDestroy())
 		return NULL;
 
 	m_stopped = false;
@@ -185,7 +184,7 @@ void *CDStarRepeaterTRXThread::Entry()
 	wxStopWatch stopWatch;
 
 	try {
-		while (!m_killed) {
+		while (!TestDestroy()) {
 			stopWatch.Start();
 
 			if (m_statusTimer.hasExpired() || m_space == 0U) {
@@ -334,11 +333,6 @@ void *CDStarRepeaterTRXThread::Entry()
 	}
 
 	return NULL;
-}
-
-void CDStarRepeaterTRXThread::kill()
-{
-	m_killed = true;
 }
 
 void CDStarRepeaterTRXThread::setCallsign(const wxString& callsign, const wxString& gateway, DSTAR_MODE mode, ACK_TYPE ack, bool restriction, bool rpt1Validation, bool dtmfBlanking, bool errorReply)

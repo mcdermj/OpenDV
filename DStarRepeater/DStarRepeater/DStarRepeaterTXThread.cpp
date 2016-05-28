@@ -50,7 +50,6 @@ m_statusTimer(1000U, 0U, 100U),		// 100ms
 m_state(DSRS_LISTENING),
 m_tx(false),
 m_space(0U),
-m_killed(false),
 m_lastData(NULL),
 m_ambe(),
 m_headerTime(),
@@ -77,10 +76,10 @@ CDStarRepeaterTXThread::~CDStarRepeaterTXThread()
 void *CDStarRepeaterTXThread::Entry()
 {
 	// Wait here until we have the essentials to run
-	while (!m_killed && (m_modem == NULL  || m_protocolHandler == NULL || m_rptCallsign.IsEmpty() || m_rptCallsign.IsSameAs(wxT("        "))))
+	while (!TestDestroy() && (m_modem == NULL  || m_protocolHandler == NULL || m_rptCallsign.IsEmpty() || m_rptCallsign.IsSameAs(wxT("        "))))
 		::wxMilliSleep(500UL);		// 1/2 sec
 
-	if (m_killed)
+	if (TestDestroy())
 		return NULL;
 
 	m_stopped = false;
@@ -98,7 +97,7 @@ void *CDStarRepeaterTXThread::Entry()
 	wxStopWatch stopWatch;
 
 	try {
-		while (!m_killed) {
+		while (!TestDestroy()) {
 			stopWatch.Start();
 
 			if (m_statusTimer.hasExpired() || m_space == 0U) {
@@ -156,11 +155,6 @@ void *CDStarRepeaterTXThread::Entry()
 	delete m_protocolHandler;
 
 	return NULL;
-}
-
-void CDStarRepeaterTXThread::kill()
-{
-	m_killed = true;
 }
 
 void CDStarRepeaterTXThread::setCallsign(const wxString& callsign, const wxString&, DSTAR_MODE, ACK_TYPE, bool, bool, bool, bool)

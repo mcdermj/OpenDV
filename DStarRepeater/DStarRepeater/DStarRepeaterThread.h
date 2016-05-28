@@ -66,9 +66,6 @@ public:
 	virtual void startup() = 0;
 
 	virtual CDStarRepeaterStatusData* getStatus() = 0;
-
-	virtual void kill() = 0;
-
 private:
 };
 

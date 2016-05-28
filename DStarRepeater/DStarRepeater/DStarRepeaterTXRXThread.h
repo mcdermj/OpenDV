@@ -64,8 +64,6 @@ public:
 
 	virtual CDStarRepeaterStatusData* getStatus();
 
-	virtual void kill();
-
 	virtual void *Entry();
 
 private:
@@ -91,7 +89,6 @@ private:
 	bool                       m_tx;
 	bool                       m_transmitting;
 	unsigned int               m_space;
-	bool                       m_killed;
 	CTimer                     m_activeHangTimer;
 	bool                       m_disable;
 	unsigned char*             m_lastData;

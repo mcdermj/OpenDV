@@ -58,8 +58,6 @@ public:
 
 	virtual CDStarRepeaterStatusData* getStatus();
 
-	virtual void kill();
-
 	virtual void *Entry();
 
 private:
@@ -72,7 +70,6 @@ private:
 	DSTAR_RPT_STATE            m_rptState;
 	DSTAR_RX_STATE             m_rxState;
 	CSlowDataDecoder           m_slowDataDecoder;
-	bool                       m_killed;
 	CAMBEFEC                   m_ambe;
 	unsigned int               m_ambeFrames;
 	unsigned int               m_ambeSilence;

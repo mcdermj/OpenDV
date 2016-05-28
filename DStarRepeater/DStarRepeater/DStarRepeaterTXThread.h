@@ -57,8 +57,6 @@ public:
 
 	virtual CDStarRepeaterStatusData* getStatus();
 
-	virtual void kill();
-
 	virtual void *Entry();
 
 private:
@@ -78,7 +76,6 @@ private:
 	DSTAR_RPT_STATE            m_state;
 	bool                       m_tx;
 	unsigned int               m_space;
-	bool                       m_killed;
 	unsigned char*             m_lastData;
 	CAMBEFEC                   m_ambe;
 	wxStopWatch                m_headerTime;

@@ -72,8 +72,6 @@ public:
 
 	virtual void *Entry();
 
-	virtual void kill();
-
 	virtual void transmitBeaconHeader();
 	virtual void transmitBeaconData(const unsigned char* data, unsigned int length, bool end);
 
@@ -135,7 +133,6 @@ private:
 
 	bool                       m_tx;
 	unsigned int               m_space;
-	bool                       m_killed;
 	DSTAR_MODE                 m_mode;
 	ACK_TYPE                   m_ack;
 	bool                       m_restriction;
