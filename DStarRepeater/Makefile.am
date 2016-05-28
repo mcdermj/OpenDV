@@ -61,7 +61,6 @@ COMMON_SRCS = \
 	Common/SplitController.cpp \
 	Common/TCPReaderWriter.cpp \
 	Common/Timer.cpp \
-	Common/UDPReaderWriter.cpp \
 	Common/Utils.cpp \
 	DStarRepeater/DStarRepeaterThread.cpp \
 	DStarRepeater/DStarRepeaterTRXThread.cpp \

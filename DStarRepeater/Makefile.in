@@ -120,8 +120,7 @@ am__libCommon_a_SOURCES_DIST = Common/AMBEFEC.cpp \
 	Common/SerialPortSelector.cpp Common/SlowDataDecoder.cpp \
 	Common/SlowDataEncoder.cpp Common/SoundCardController.cpp \
 	Common/SoundCardReaderWriter.cpp Common/SplitController.cpp \
-	Common/TCPReaderWriter.cpp Common/Timer.cpp \
-	Common/UDPReaderWriter.cpp Common/Utils.cpp \
+	Common/TCPReaderWriter.cpp Common/Timer.cpp Common/Utils.cpp \
 	DStarRepeater/DStarRepeaterThread.cpp \
 	DStarRepeater/DStarRepeaterTRXThread.cpp \
 	DStarRepeater/DStarRepeaterTXRXThread.cpp \
@@ -172,7 +171,6 @@ am__objects_2 = Common/libCommon_a-AMBEFEC.$(OBJEXT) \
 	Common/libCommon_a-SplitController.$(OBJEXT) \
 	Common/libCommon_a-TCPReaderWriter.$(OBJEXT) \
 	Common/libCommon_a-Timer.$(OBJEXT) \
-	Common/libCommon_a-UDPReaderWriter.$(OBJEXT) \
 	Common/libCommon_a-Utils.$(OBJEXT) \
 	DStarRepeater/libCommon_a-DStarRepeaterThread.$(OBJEXT) \
 	DStarRepeater/libCommon_a-DStarRepeaterTRXThread.$(OBJEXT) \
@@ -576,8 +574,7 @@ COMMON_SRCS = Common/AMBEFEC.cpp Common/AnnouncementUnit.cpp \
 	Common/SerialPortSelector.cpp Common/SlowDataDecoder.cpp \
 	Common/SlowDataEncoder.cpp Common/SoundCardController.cpp \
 	Common/SoundCardReaderWriter.cpp Common/SplitController.cpp \
-	Common/TCPReaderWriter.cpp Common/Timer.cpp \
-	Common/UDPReaderWriter.cpp Common/Utils.cpp \
+	Common/TCPReaderWriter.cpp Common/Timer.cpp Common/Utils.cpp \
 	DStarRepeater/DStarRepeaterThread.cpp \
 	DStarRepeater/DStarRepeaterTRXThread.cpp \
 	DStarRepeater/DStarRepeaterTXRXThread.cpp \
@@ -742,8 +739,6 @@ Common/libCommon_a-SplitController.$(OBJEXT): Common/$(am__dirstamp) \
 Common/libCommon_a-TCPReaderWriter.$(OBJEXT): Common/$(am__dirstamp) \
 	Common/$(DEPDIR)/$(am__dirstamp)
 Common/libCommon_a-Timer.$(OBJEXT): Common/$(am__dirstamp) \
-	Common/$(DEPDIR)/$(am__dirstamp)
-Common/libCommon_a-UDPReaderWriter.$(OBJEXT): Common/$(am__dirstamp) \
 	Common/$(DEPDIR)/$(am__dirstamp)
 Common/libCommon_a-Utils.$(OBJEXT): Common/$(am__dirstamp) \
 	Common/$(DEPDIR)/$(am__dirstamp)
@@ -1058,7 +1053,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@Common/$(DEPDIR)/libCommon_a-SplitController.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Common/$(DEPDIR)/libCommon_a-TCPReaderWriter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Common/$(DEPDIR)/libCommon_a-Timer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@Common/$(DEPDIR)/libCommon_a-UDPReaderWriter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Common/$(DEPDIR)/libCommon_a-UDRCController.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Common/$(DEPDIR)/libCommon_a-URIUSBController.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Common/$(DEPDIR)/libCommon_a-Utils.Po@am__quote@
@@ -1563,20 +1557,6 @@ Common/libCommon_a-Timer.obj: Common/Timer.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Common/Timer.cpp' object='Common/libCommon_a-Timer.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libCommon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Common/libCommon_a-Timer.obj `if test -f 'Common/Timer.cpp'; then $(CYGPATH_W) 'Common/Timer.cpp'; else $(CYGPATH_W) '$(srcdir)/Common/Timer.cpp'; fi`
-
-Common/libCommon_a-UDPReaderWriter.o: Common/UDPReaderWriter.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libCommon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Common/libCommon_a-UDPReaderWriter.o -MD -MP -MF Common/$(DEPDIR)/libCommon_a-UDPReaderWriter.Tpo -c -o Common/libCommon_a-UDPReaderWriter.o `test -f 'Common/UDPReaderWriter.cpp' || echo '$(srcdir)/'`Common/UDPReaderWriter.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) Common/$(DEPDIR)/libCommon_a-UDPReaderWriter.Tpo Common/$(DEPDIR)/libCommon_a-UDPReaderWriter.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Common/UDPReaderWriter.cpp' object='Common/libCommon_a-UDPReaderWriter.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libCommon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Common/libCommon_a-UDPReaderWriter.o `test -f 'Common/UDPReaderWriter.cpp' || echo '$(srcdir)/'`Common/UDPReaderWriter.cpp
-
-Common/libCommon_a-UDPReaderWriter.obj: Common/UDPReaderWriter.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libCommon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Common/libCommon_a-UDPReaderWriter.obj -MD -MP -MF Common/$(DEPDIR)/libCommon_a-UDPReaderWriter.Tpo -c -o Common/libCommon_a-UDPReaderWriter.obj `if test -f 'Common/UDPReaderWriter.cpp'; then $(CYGPATH_W) 'Common/UDPReaderWriter.cpp'; else $(CYGPATH_W) '$(srcdir)/Common/UDPReaderWriter.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) Common/$(DEPDIR)/libCommon_a-UDPReaderWriter.Tpo Common/$(DEPDIR)/libCommon_a-UDPReaderWriter.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Common/UDPReaderWriter.cpp' object='Common/libCommon_a-UDPReaderWriter.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libCommon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Common/libCommon_a-UDPReaderWriter.obj `if test -f 'Common/UDPReaderWriter.cpp'; then $(CYGPATH_W) 'Common/UDPReaderWriter.cpp'; else $(CYGPATH_W) '$(srcdir)/Common/UDPReaderWriter.cpp'; fi`
 
 Common/libCommon_a-Utils.o: Common/Utils.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libCommon_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Common/libCommon_a-Utils.o -MD -MP -MF Common/$(DEPDIR)/libCommon_a-Utils.Tpo -c -o Common/libCommon_a-Utils.o `test -f 'Common/Utils.cpp' || echo '$(srcdir)/'`Common/Utils.cpp

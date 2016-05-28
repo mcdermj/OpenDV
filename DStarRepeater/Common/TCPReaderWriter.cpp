@@ -16,8 +16,9 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <wx/socket.h>
+
 #include "TCPReaderWriter.h"
-#include "UDPReaderWriter.h"
 
 #if !defined(__WINDOWS__)
 #include <cerrno>
@@ -116,18 +117,19 @@ bool CTCPReaderWriter::open()
 		}
 	}
 
-	struct sockaddr_in addr;
-	::memset(&addr, 0x00, sizeof(struct sockaddr_in));
-	addr.sin_family = AF_INET;
-	addr.sin_port   = htons(m_port);
-	addr.sin_addr   = CUDPReaderWriter::lookup(m_address);
-
-	if (addr.sin_addr.s_addr == INADDR_NONE) {
+	wxIPV4address remoteAddress;
+	if(!remoteAddress.Hostname(m_address)) {
+		wxLogError("Cannot find hostname");
+		close();
+		return false;
+	}
+	if(!remoteAddress.Service(m_port)) {
+		wxLogError("Invalid port");
 		close();
 		return false;
 	}
 
-	if (::connect(m_fd, (sockaddr*)&addr, sizeof(struct sockaddr_in)) == -1) {
+	if (::connect(m_fd, remoteAddress.GetAddressData(), remoteAddress.GetAddressDataLen()) == -1) {
 #if defined(__WINDOWS__)
 		wxLogError(wxT("Cannot connect the TCP  socket, err=%d"), ::GetLastError());
 #else

@@ -22,7 +22,6 @@
 #include <wx/wx.h>
 #include <wx/socket.h>
 
-#include "UDPReaderWriter.h"
 #include "DStarDefines.h"
 #include "HeaderData.h"
 
