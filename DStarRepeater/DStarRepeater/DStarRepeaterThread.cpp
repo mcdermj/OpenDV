@@ -21,3 +21,10 @@ wxThread(wxTHREAD_JOINABLE)
 IDStarRepeaterThread::~IDStarRepeaterThread()
 {
 }
+
+void IDStarRepeaterThread::setModem(CModem* modem)
+{
+	wxASSERT(modem != NULL);
+
+	m_modem = modem;
+}

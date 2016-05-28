@@ -43,7 +43,7 @@ public:
 	virtual void setCallsign(const wxString& callsign, const wxString& gateway, DSTAR_MODE mode, ACK_TYPE ack, bool restriction, bool rpt1Validation, bool dtmfBlanking, bool errorReply) = 0;
 
 	virtual void setProtocolHandler(CRepeaterProtocolHandler* handler, bool local) = 0;
-	virtual void setModem(CModem* modem) = 0;
+	void setModem(CModem* modem);
 	virtual void setController(CExternalController* controller, unsigned int activeHangTime) = 0;
 
 	virtual void setTimes(unsigned int timeout, unsigned int ackTime) = 0;
@@ -66,6 +66,10 @@ public:
 	virtual void startup() = 0;
 
 	virtual CDStarRepeaterStatusData* getStatus() = 0;
+
+protected:
+	CModem *m_modem;
+
 private:
 };
 

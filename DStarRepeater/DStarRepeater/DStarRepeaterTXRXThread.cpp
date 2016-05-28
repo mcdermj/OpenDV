@@ -37,7 +37,6 @@ const unsigned int CYCLE_TIME = 9U;
 
 CDStarRepeaterTXRXThread::CDStarRepeaterTXRXThread(const wxString& type) :
 m_type(type),
-m_modem(NULL),
 m_protocolHandler(NULL),
 m_controller(NULL),
 m_rptCallsign(),
@@ -234,13 +233,6 @@ void CDStarRepeaterTXRXThread::setProtocolHandler(CRepeaterProtocolHandler* hand
 		for (unsigned int i = 0U; i < NETWORK_QUEUE_COUNT; i++)
 			m_networkQueue[i]->setThreshold(LOCAL_RUN_FRAME_COUNT);
 	}
-}
-
-void CDStarRepeaterTXRXThread::setModem(CModem* modem)
-{
-	wxASSERT(modem != NULL);
-
-	m_modem = modem;
 }
 
 void CDStarRepeaterTXRXThread::setTimes(unsigned int, unsigned int)
