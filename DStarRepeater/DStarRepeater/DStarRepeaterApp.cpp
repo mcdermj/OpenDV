@@ -321,6 +321,52 @@ void CDStarRepeaterApp::shutdown()
 	m_thread->shutdown();
 }
 
+bool CDStarRepeaterApp::setupGateway()
+{
+	wxString gatewayAddressName, localAddressName, name;
+	unsigned int gatewayPort, localPort;
+	wxIPV4address gatewayAddress, localAddress;
+
+	m_config->getNetwork(gatewayAddressName, gatewayPort, localAddressName,
+		localPort, name);
+	wxLogInfo("Gateway set to %s:%u, local set to %s:%u, name set to \"%s\"",
+		gatewayAddressName, gatewayPort, localAddressName, localPort,
+		name);
+
+	if (gatewayAddressName.IsEmpty())
+		return false;
+
+	if(!gatewayAddress.Hostname(gatewayAddressName)) {
+		wxLogError("Could not find hostname %s", gatewayAddressName);
+		return false;
+	}
+
+	if(!gatewayAddress.Service(gatewayPort)) {
+		wxLogError("Invalid gateway port %d", gatewayPort);
+		return false;
+	}
+
+	if(!localAddress.Hostname(localAddressName)) {
+		wxLogError("Could not find local hostname %s", localAddressName);
+		return false;
+	}
+
+	if(!localAddress.Service(localPort)) {
+		wxLogError("Invalid local port %d", localPort);
+		return false;
+	}
+
+	try {
+		m_thread->setProtocolHandler(new CRepeaterProtocolHandler(localAddress, gatewayAddress, name), localAddress.IsLocalHost());
+	} catch ( ... ) {
+		wxLogError("Could not create protocol Handler");
+		return false;
+	}
+
+
+	return true;
+}
+
 void CDStarRepeaterApp::createThread()
 {
 	wxASSERT(m_config != NULL);
@@ -345,7 +391,6 @@ void CDStarRepeaterApp::createThread()
 		}
 	}
 
-	//  XXX This should be m_thread eventually.
 	switch (mode) {
 		case MODE_RXONLY:
 			m_thread = new CDStarRepeaterRXThread(modemType);
@@ -364,22 +409,7 @@ void CDStarRepeaterApp::createThread()
 	m_thread->setCallsign(callsign, gateway, mode, ack, restriction, rpt1Validation, dtmfBlanking, errorReply);
 	wxLogInfo("Callsign set to \"%s\", gateway set to \"%s\", mode: %d, ack: %d, restriction: %d, RPT1 validation: %d, DTMF blanking: %d, Error reply: %d", callsign.c_str(), gateway.c_str(), int(mode), int(ack), int(restriction), int(rpt1Validation), int(dtmfBlanking), int(errorReply));
 
-	wxString gatewayAddress, localAddress, name;
-	unsigned int gatewayPort, localPort;
-	m_config->getNetwork(gatewayAddress, gatewayPort, localAddress, localPort, name);
-	wxLogInfo("Gateway set to %s:%u, local set to %s:%u, name set to \"%s\"", gatewayAddress.c_str(), gatewayPort, localAddress.c_str(), localPort, name.c_str());
-
-	if (!gatewayAddress.IsEmpty()) {
-		bool local = gatewayAddress.IsSameAs("127.0.0.1");
-
-		CRepeaterProtocolHandler* handler = new CRepeaterProtocolHandler(gatewayAddress, gatewayPort, localAddress, localPort, name);
-
-		bool res = handler->open();
-		if (!res)
-			wxLogError("Cannot open the protocol handler");
-		else
-			m_thread->setProtocolHandler(handler, local);
-	}
+	setupGateway();
 
 	unsigned int timeout, ackTime;
 	m_config->getTimes(timeout, ackTime);

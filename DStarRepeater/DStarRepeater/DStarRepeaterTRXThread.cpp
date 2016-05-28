@@ -327,10 +327,8 @@ void *CDStarRepeaterTRXThread::Entry()
 	m_controller->close();
 	delete m_controller;
 
-	if (m_protocolHandler != NULL) {
-		m_protocolHandler->close();
+	if (m_protocolHandler != NULL)
 		delete m_protocolHandler;
-	}
 
 	return NULL;
 }

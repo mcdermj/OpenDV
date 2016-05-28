@@ -151,7 +151,6 @@ void *CDStarRepeaterTXThread::Entry()
 
 	m_modem->stop();
 
-	m_protocolHandler->close();
 	delete m_protocolHandler;
 
 	return NULL;

@@ -210,7 +210,6 @@ void *CDStarRepeaterTXRXThread::Entry()
 	m_controller->close();
 	delete m_controller;
 
-	m_protocolHandler->close();
 	delete m_protocolHandler;
 
 	return NULL;

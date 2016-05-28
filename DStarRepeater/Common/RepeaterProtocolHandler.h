@@ -19,18 +19,19 @@
 #ifndef	RepeaterProtocolHander_H
 #define	RepeaterProtocolHander_H
 
+#include <wx/wx.h>
+#include <wx/socket.h>
+
 #include "UDPReaderWriter.h"
 #include "DStarDefines.h"
 #include "HeaderData.h"
 
-#include <wx/wx.h>
-
 class CRepeaterProtocolHandler {
 public:
-	CRepeaterProtocolHandler(const wxString& gatewayAddress, unsigned int gatewayPort, const wxString& localAddress, unsigned int localPort, const wxString& name);
+	CRepeaterProtocolHandler(const wxIPV4address& localAddress,
+				 const wxIPV4address& gatewayAddress,
+	 			 const wxString& name);
 	~CRepeaterProtocolHandler();
-
-	bool open();
 
 	bool writeHeader(const CHeaderData& header);
 	bool writeBusyHeader(const CHeaderData& header);
@@ -51,13 +52,9 @@ public:
 	unsigned int readData(unsigned char* data, unsigned int length, unsigned char& seqNo);
 
 	void reset();
-
-	void close();
-
 private:
-	CUDPReaderWriter m_socket;
-	in_addr          m_address;
-	unsigned int     m_port;
+	wxDatagramSocket m_socket;
+	wxIPV4address    m_gatewayAddress;
 	wxString         m_name;
 	wxUint16         m_outId;
 	wxUint8          m_outSeq;

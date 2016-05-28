@@ -16,6 +16,8 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <stdexcept>
+
 #include "RepeaterProtocolHandler.h"
 #include "CCITTChecksumReverse.h"
 #include "DStarDefines.h"
@@ -25,10 +27,9 @@
 
 const unsigned int BUFFER_LENGTH = 255U;
 
-CRepeaterProtocolHandler::CRepeaterProtocolHandler(const wxString& gatewayAddress, unsigned int gatewayPort, const wxString& localAddress, unsigned int localPort, const wxString& name) :
-m_socket(localAddress, localPort),
-m_address(),
-m_port(gatewayPort),
+CRepeaterProtocolHandler::CRepeaterProtocolHandler(const wxIPV4address& localAddress, const wxIPV4address& gatewayAddress, const wxString& name) :
+m_socket(localAddress, wxSOCKET_REUSEADDR | wxSOCKET_NOWAIT),
+m_gatewayAddress(gatewayAddress),
 m_name(name),
 m_outId(0U),
 m_outSeq(0U),
@@ -37,25 +38,14 @@ m_inId(0U),
 m_buffer(NULL),
 m_length(0U)
 {
-	m_address = CUDPReaderWriter::lookup(gatewayAddress);
-
 	m_buffer = new unsigned char[BUFFER_LENGTH];
 
-	wxDateTime now = wxDateTime::UNow();
-	::srand(now.GetMillisecond());
+	::srand(wxDateTime::UNow().GetMillisecond());
 }
 
 CRepeaterProtocolHandler::~CRepeaterProtocolHandler()
 {
 	delete[] m_buffer;
-}
-
-bool CRepeaterProtocolHandler::open()
-{
-	if (m_address.s_addr == INADDR_NONE)
-		return false;
-
-	return m_socket.open();
 }
 
 bool CRepeaterProtocolHandler::writeHeader(const CHeaderData& header)
@@ -108,8 +98,8 @@ bool CRepeaterProtocolHandler::writeHeader(const CHeaderData& header)
 #endif
 
 	for (unsigned int i = 0U; i < 2U; i++) {
-		bool ret = m_socket.write(buffer, 49U, m_address, m_port);
-		if (!ret)
+		m_socket.SendTo(m_gatewayAddress, buffer, 49);
+		if(m_socket.Error())
 			return false;
 	}
 
@@ -153,7 +143,8 @@ bool CRepeaterProtocolHandler::writeData(const unsigned char* data, unsigned int
 	CUtils::dump(wxT("Sending Data"), buffer, length + 9U);
 #endif
 
-	return m_socket.write(buffer, length + 9U, m_address, m_port);
+	m_socket.SendTo(m_gatewayAddress, buffer, length + 9);
+	return m_socket.Error();
 }
 
 bool CRepeaterProtocolHandler::writeBusyHeader(const CHeaderData& header)
@@ -205,7 +196,8 @@ bool CRepeaterProtocolHandler::writeBusyHeader(const CHeaderData& header)
 	CUtils::dump(wxT("Sending Busy Header"), buffer, 49U);
 #endif
 
-	return m_socket.write(buffer, 49U, m_address, m_port);
+	m_socket.SendTo(m_gatewayAddress, buffer, 49);
+	return m_socket.Error();
 }
 
 bool CRepeaterProtocolHandler::writeBusyData(const unsigned char* data, unsigned int length, unsigned int errors, bool end)
@@ -245,7 +237,8 @@ bool CRepeaterProtocolHandler::writeBusyData(const unsigned char* data, unsigned
 	CUtils::dump(wxT("Sending Busy Data"), buffer, length + 9U);
 #endif
 
-	return m_socket.write(buffer, length + 9U, m_address, m_port);
+	m_socket.SendTo(m_gatewayAddress, buffer, length + 9);
+	return m_socket.Error();
 }
 
 bool CRepeaterProtocolHandler::writePoll(const wxString& text)
@@ -270,7 +263,8 @@ bool CRepeaterProtocolHandler::writePoll(const wxString& text)
 	CUtils::dump(wxT("Sending Poll"), buffer, 6U + length);
 #endif
 
-	return m_socket.write(buffer, 6U + length, m_address, m_port);
+	m_socket.SendTo(m_gatewayAddress, buffer, length + 6);
+	return m_socket.Error();
 }
 
 bool CRepeaterProtocolHandler::writeRegister()
@@ -295,7 +289,8 @@ bool CRepeaterProtocolHandler::writeRegister()
 	CUtils::dump(wxT("Sending Register"), buffer, 6U + length);
 #endif
 
-	return m_socket.write(buffer, 6U + length, m_address, m_port);
+	m_socket.SendTo(m_gatewayAddress, buffer, length + 6);
+	return m_socket.Error();
 }
 
 NETWORK_TYPE CRepeaterProtocolHandler::read()
@@ -313,21 +308,20 @@ bool CRepeaterProtocolHandler::readPackets()
 {
 	m_type = NETWORK_NONE;
 
-	// No more data?
-	in_addr address;
-	unsigned int port;
-	int length = m_socket.read(m_buffer, BUFFER_LENGTH, address, port);
-	if (length <= 0)
+	wxIPV4address remoteAddress;
+	m_socket.RecvFrom(remoteAddress, m_buffer, BUFFER_LENGTH);
+	m_length = m_socket.LastReadCount();
+
+	if (m_length <= 0)
 		return false;
 
-	// Check if the data is for us
-	if (m_address.s_addr != address.s_addr || m_port != port) {
-		wxLogMessage(wxT("Packet received from an invalid source, %08X != %08X and/or %u != %u"), m_address.s_addr, address.s_addr, m_port, port);
-		CUtils::dump(wxT("Data"), m_buffer, length);
+	if(remoteAddress != m_gatewayAddress) {
+		wxLogMessage(wxT("Packet received from an invalid source, %s != %s and/or %u != %u"),
+			m_gatewayAddress.IPAddress(), remoteAddress.IPAddress(),
+			m_gatewayAddress.Service(), remoteAddress.Service());
+		CUtils::dump(wxT("Data"), m_buffer, m_length);
 		return false;
 	}
-
-	m_length = length;
 
 	// Invalid packet type?
 	if (m_buffer[0] == 'D' && m_buffer[1] == 'S' && m_buffer[2] == 'R' && m_buffer[3] == 'P') {
@@ -531,9 +525,4 @@ wxString CRepeaterProtocolHandler::readStatus5()
 void CRepeaterProtocolHandler::reset()
 {
 	m_inId = 0U;
-}
-
-void CRepeaterProtocolHandler::close()
-{
-	m_socket.close();
 }

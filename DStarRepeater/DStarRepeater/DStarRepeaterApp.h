@@ -79,6 +79,7 @@ private:
 	wxString					m_commandLine[6];
 
 	void createThread();
+	bool setupGateway();
 
 	void OnRemoteCmd(wxThreadEvent& event);
 
