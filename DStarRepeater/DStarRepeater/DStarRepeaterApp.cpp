@@ -206,6 +206,7 @@ int CDStarRepeaterApp::OnExit()
 	m_logChain->SetLog(NULL);
 
 	m_thread->Delete(NULL, wxTHREAD_WAIT_BLOCK);
+	delete m_thread;
 
 	delete m_config;
 
