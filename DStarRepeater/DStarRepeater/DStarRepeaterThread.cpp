@@ -29,7 +29,7 @@ void IDStarRepeaterThread::setModem(CModem* modem)
 	m_modem = modem;
 }
 
-void IDStarRepeaterThread::setProtocolHandler(CRepeaterProtocolHandler* handler, bool local)
+void IDStarRepeaterThread::setProtocolHandler(CRepeaterProtocolHandler* handler)
 {
 	wxASSERT(handler != NULL);
 
