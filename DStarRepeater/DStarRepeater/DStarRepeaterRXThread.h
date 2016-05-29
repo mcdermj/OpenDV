@@ -33,7 +33,6 @@ public:
 	virtual ~CDStarRepeaterRXThread();
 
 	virtual void setCallsign(const wxString& callsign, const wxString& gateway, DSTAR_MODE mode, ACK_TYPE ack, bool restriction, bool rpt1Validation, bool dtmfBlanking, bool errorReply);
-	virtual void setProtocolHandler(CRepeaterProtocolHandler* handler, bool local);
 	virtual void setController(CExternalController* controller, unsigned int activeHangTime);
 	virtual void setTimes(unsigned int timeout, unsigned int ackTime);
 	virtual void setBeacon(unsigned int time, const wxString& text, bool voice, TEXT_LANG language);
@@ -61,7 +60,6 @@ public:
 
 private:
 	wxString                   m_type;
-	CRepeaterProtocolHandler*  m_protocolHandler;
 	CHeaderData*               m_rxHeader;
 	unsigned char              m_radioSeqNo;
 	CTimer                     m_registerTimer;

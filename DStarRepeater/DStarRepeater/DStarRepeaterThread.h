@@ -42,8 +42,9 @@ public:
 
 	virtual void setCallsign(const wxString& callsign, const wxString& gateway, DSTAR_MODE mode, ACK_TYPE ack, bool restriction, bool rpt1Validation, bool dtmfBlanking, bool errorReply) = 0;
 
-	virtual void setProtocolHandler(CRepeaterProtocolHandler* handler, bool local) = 0;
+	virtual void setProtocolHandler(CRepeaterProtocolHandler* handler, bool local);
 	void setModem(CModem* modem);
+
 	virtual void setController(CExternalController* controller, unsigned int activeHangTime) = 0;
 
 	virtual void setTimes(unsigned int timeout, unsigned int ackTime) = 0;
@@ -69,6 +70,7 @@ public:
 
 protected:
 	CModem *m_modem;
+	CRepeaterProtocolHandler*  m_protocolHandler;
 
 private:
 };

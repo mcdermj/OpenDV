@@ -37,7 +37,6 @@ const unsigned int CYCLE_TIME = 9U;
 
 CDStarRepeaterTXRXThread::CDStarRepeaterTXRXThread(const wxString& type) :
 m_type(type),
-m_protocolHandler(NULL),
 m_controller(NULL),
 m_rptCallsign(),
 m_rxHeader(NULL),
@@ -100,6 +99,13 @@ void *CDStarRepeaterTXRXThread::Entry()
 
 	if (TestDestroy())
 		return NULL;
+
+	if (m_protocolHandler->isLocal()) {
+		wxLogInfo(wxT("Reducing transmit buffering because of local connection"));
+
+		for (unsigned int i = 0U; i < NETWORK_QUEUE_COUNT; i++)
+			m_networkQueue[i]->setThreshold(LOCAL_RUN_FRAME_COUNT);
+	}
 
 	m_controller->setActive(false);
 	m_controller->setRadioTransmit(false);
@@ -219,20 +225,6 @@ void CDStarRepeaterTXRXThread::setCallsign(const wxString& callsign, const wxStr
 	// Pad the callsign up to eight characters
 	m_rptCallsign = callsign;
 	m_rptCallsign.resize(LONG_CALLSIGN_LENGTH, wxT(' '));
-}
-
-void CDStarRepeaterTXRXThread::setProtocolHandler(CRepeaterProtocolHandler* handler, bool local)
-{
-	wxASSERT(handler != NULL);
-
-	m_protocolHandler = handler;
-
-	if (local) {
-		wxLogInfo(wxT("Reducing transmit buffering because of local connection"));
-
-		for (unsigned int i = 0U; i < NETWORK_QUEUE_COUNT; i++)
-			m_networkQueue[i]->setThreshold(LOCAL_RUN_FRAME_COUNT);
-	}
 }
 
 void CDStarRepeaterTXRXThread::setTimes(unsigned int, unsigned int)

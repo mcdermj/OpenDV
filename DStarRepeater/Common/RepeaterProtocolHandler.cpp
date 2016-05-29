@@ -527,3 +527,8 @@ void CRepeaterProtocolHandler::reset()
 {
 	m_inId = 0U;
 }
+
+bool CRepeaterProtocolHandler::isLocal()
+{
+	return m_gatewayAddress.IsLocalHost();
+}

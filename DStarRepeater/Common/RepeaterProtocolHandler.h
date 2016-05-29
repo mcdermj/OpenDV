@@ -39,6 +39,8 @@ public:
 	bool writePoll(const wxString& text);
 	bool writeRegister();
 
+	bool isLocal();
+
 	NETWORK_TYPE read();
 	void         readText(wxString& text, LINK_STATUS& status, wxString& reflector);
 	void         readTempText(wxString& text);

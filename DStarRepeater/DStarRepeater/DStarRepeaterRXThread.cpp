@@ -35,7 +35,6 @@ const unsigned int CYCLE_TIME = 9U;
 
 CDStarRepeaterRXThread::CDStarRepeaterRXThread(const wxString& type) :
 m_type(type),
-m_protocolHandler(NULL),
 m_rxHeader(NULL),
 m_radioSeqNo(0U),
 m_registerTimer(1000U),
@@ -120,13 +119,6 @@ void *CDStarRepeaterRXThread::Entry()
 
 void CDStarRepeaterRXThread::setCallsign(const wxString&, const wxString&, DSTAR_MODE, ACK_TYPE, bool, bool, bool, bool)
 {
-}
-
-void CDStarRepeaterRXThread::setProtocolHandler(CRepeaterProtocolHandler* handler, bool local)
-{
-	wxASSERT(handler != NULL);
-
-	m_protocolHandler = handler;
 }
 
 void CDStarRepeaterRXThread::setTimes(unsigned int, unsigned int)

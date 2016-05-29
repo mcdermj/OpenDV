@@ -357,7 +357,7 @@ bool CDStarRepeaterApp::setupGateway()
 	}
 
 	try {
-		m_thread->setProtocolHandler(new CRepeaterProtocolHandler(localAddress, gatewayAddress, name), localAddress.IsLocalHost());
+		m_thread->setProtocolHandler(new CRepeaterProtocolHandler(localAddress, gatewayAddress, name), gatewayAddress.IsLocalHost());
 	} catch ( ... ) {
 		wxLogError("Could not create protocol Handler");
 		return false;

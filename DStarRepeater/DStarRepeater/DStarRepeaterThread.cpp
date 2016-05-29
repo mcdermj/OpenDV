@@ -28,3 +28,10 @@ void IDStarRepeaterThread::setModem(CModem* modem)
 
 	m_modem = modem;
 }
+
+void IDStarRepeaterThread::setProtocolHandler(CRepeaterProtocolHandler* handler, bool local)
+{
+	wxASSERT(handler != NULL);
+
+	m_protocolHandler = handler;
+}

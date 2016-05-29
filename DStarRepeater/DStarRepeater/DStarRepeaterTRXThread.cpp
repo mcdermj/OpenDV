@@ -37,7 +37,6 @@ const unsigned int CYCLE_TIME = 9U;
 
 CDStarRepeaterTRXThread::CDStarRepeaterTRXThread(const wxString& type) :
 m_type(type),
-m_protocolHandler(NULL),
 m_controller(NULL),
 m_stopped(true),
 m_rptCallsign(),
@@ -353,13 +352,6 @@ void CDStarRepeaterTRXThread::setCallsign(const wxString& callsign, const wxStri
 	m_rpt1Validation = rpt1Validation;
 	m_blanking       = dtmfBlanking;
 	m_errorReply     = errorReply;
-}
-
-void CDStarRepeaterTRXThread::setProtocolHandler(CRepeaterProtocolHandler* handler, bool local)
-{
-	wxASSERT(handler != NULL);
-
-	m_protocolHandler = handler;
 }
 
 void CDStarRepeaterTRXThread::setTimes(unsigned int timeout, unsigned int ackTime)
