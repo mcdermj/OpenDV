@@ -1153,7 +1153,7 @@ bool CDStarRepeaterTRXThread::setRepeaterState(DSTAR_RPT_STATE state)
 				unsigned char bytes[DV_FRAME_MAX_LENGTH_BYTES];
 				::memcpy(bytes, NULL_AMBE_DATA_BYTES, VOICE_FRAME_LENGTH_BYTES);
 				::memcpy(bytes + VOICE_FRAME_LENGTH_BYTES, END_PATTERN_BYTES, END_PATTERN_LENGTH_BYTES);
-				m_protocolHandler->writeData(bytes, DV_FRAME_MAX_LENGTH_BYTES, 0U, true);
+				m_protocolHandler->write(bytes, DV_FRAME_MAX_LENGTH_BYTES, 0U, true);
 			}
 
 			m_timeoutTimer.stop();
@@ -1303,7 +1303,7 @@ bool CDStarRepeaterTRXThread::processRadioHeader(CHeaderData* header)
 				netHeader.setRptCall1(header->getRptCall2());
 				netHeader.setRptCall2(header->getRptCall1());
 				netHeader.setFlag1(header->getFlag1() & ~REPEATER_MASK);
-				m_protocolHandler->writeBusyHeader(netHeader);
+				m_protocolHandler->write(netHeader, true);
 			}
 
 			m_busyData = true;
@@ -1329,7 +1329,7 @@ bool CDStarRepeaterTRXThread::processRadioHeader(CHeaderData* header)
 			netHeader.setRptCall1(m_rxHeader->getRptCall2());
 			netHeader.setRptCall2(m_rxHeader->getRptCall1());
 			netHeader.setFlag1(m_rxHeader->getFlag1() & ~REPEATER_MASK);
-			m_protocolHandler->writeHeader(netHeader);
+			m_protocolHandler->write(netHeader);
 		}
 
 		// Create the new radio header but only in duplex mode
@@ -1433,13 +1433,13 @@ void CDStarRepeaterTRXThread::processRadioFrame(unsigned char* data, FRAME_TYPE 
 				unsigned char bytes[DV_FRAME_MAX_LENGTH_BYTES];
 				::memcpy(bytes, NULL_AMBE_DATA_BYTES, VOICE_FRAME_LENGTH_BYTES);
 				::memcpy(bytes + VOICE_FRAME_LENGTH_BYTES, END_PATTERN_BYTES, END_PATTERN_LENGTH_BYTES);
-				m_protocolHandler->writeBusyData(bytes, DV_FRAME_MAX_LENGTH_BYTES, 0U, true);
+				m_protocolHandler->write(bytes, DV_FRAME_MAX_LENGTH_BYTES, 0U, true, true);
 			}
 
 			m_busyData = false;
 		} else {
 			if (!m_blocked && m_protocolHandler != NULL)
-				m_protocolHandler->writeBusyData(data, DV_FRAME_LENGTH_BYTES, errors, false);
+				m_protocolHandler->write(data, DV_FRAME_LENGTH_BYTES, errors, false, true);
 		}
 
 		return;
@@ -1462,7 +1462,7 @@ void CDStarRepeaterTRXThread::processRadioFrame(unsigned char* data, FRAME_TYPE 
 			unsigned char bytes[DV_FRAME_MAX_LENGTH_BYTES];
 			::memcpy(bytes, NULL_AMBE_DATA_BYTES, VOICE_FRAME_LENGTH_BYTES);
 			::memcpy(bytes + VOICE_FRAME_LENGTH_BYTES, END_PATTERN_BYTES, END_PATTERN_LENGTH_BYTES);
-			m_protocolHandler->writeData(bytes, DV_FRAME_MAX_LENGTH_BYTES, 0U, true);
+			m_protocolHandler->write(bytes, DV_FRAME_MAX_LENGTH_BYTES, 0U, true);
 		}
 	} else {
 		if (m_logging != NULL)
@@ -1470,7 +1470,7 @@ void CDStarRepeaterTRXThread::processRadioFrame(unsigned char* data, FRAME_TYPE 
 
 		// Send the data to the network
 		if (!m_blocked && m_protocolHandler != NULL)
-			m_protocolHandler->writeData(data, DV_FRAME_LENGTH_BYTES, errors, false);
+			m_protocolHandler->write(data, DV_FRAME_LENGTH_BYTES, errors, false);
 
 		// Send the data for transmission, but only in duplex mode
 		if (m_mode == MODE_DUPLEX) {

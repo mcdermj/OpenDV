@@ -14,7 +14,9 @@
 #include "DStarRepeaterThread.h"
 
 IDStarRepeaterThread::IDStarRepeaterThread():
-wxThread(wxTHREAD_JOINABLE)
+wxThread(wxTHREAD_JOINABLE),
+m_protocolHandler(NULL),
+m_modem(NULL)
 {
 }
 

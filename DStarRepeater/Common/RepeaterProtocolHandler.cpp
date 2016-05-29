@@ -48,7 +48,7 @@ CRepeaterProtocolHandler::~CRepeaterProtocolHandler()
 	delete[] m_buffer;
 }
 
-bool CRepeaterProtocolHandler::writeHeader(const CHeaderData& header)
+bool CRepeaterProtocolHandler::write(const CHeaderData& header, bool busy)
 {
 	unsigned char buffer[50U];
 
@@ -57,7 +57,7 @@ bool CRepeaterProtocolHandler::writeHeader(const CHeaderData& header)
 	buffer[2] = 'R';
 	buffer[3] = 'P';
 
-	buffer[4] = 0x20U;
+	buffer[4] = busy ? 0x22 : 0x20;
 
 	// Create a random id for this transmission
 	m_outId = (::rand() % 65535U) + 1U;
@@ -97,7 +97,8 @@ bool CRepeaterProtocolHandler::writeHeader(const CHeaderData& header)
 	CUtils::dump(wxT("Sending Header"), buffer, 49U);
 #endif
 
-	for (unsigned int i = 0U; i < 2U; i++) {
+	//  XXX I don't know why we send two packets here...
+	for (int i = 0U; i < (busy ? 1 : 2); i++) {
 		m_socket.SendTo(m_gatewayAddress, buffer, 49);
 		if(m_socket.Error())
 			return false;
@@ -106,7 +107,7 @@ bool CRepeaterProtocolHandler::writeHeader(const CHeaderData& header)
 	return true;
 }
 
-bool CRepeaterProtocolHandler::writeData(const unsigned char* data, unsigned int length, unsigned int errors, bool end)
+bool CRepeaterProtocolHandler::write(const unsigned char* data, unsigned int length, unsigned int errors, bool end, bool busy)
 {
 	wxASSERT(data != NULL);
 	wxASSERT(length == DV_FRAME_LENGTH_BYTES || length == DV_FRAME_MAX_LENGTH_BYTES);
@@ -118,7 +119,7 @@ bool CRepeaterProtocolHandler::writeData(const unsigned char* data, unsigned int
 	buffer[2] = 'R';
 	buffer[3] = 'P';
 
-	buffer[4] = 0x21U;
+	buffer[4] = busy ? 0x23 : 0x21;
 
 	buffer[5] = m_outId / 256U;	// Unique session id
 	buffer[6] = m_outId % 256U;
@@ -141,100 +142,6 @@ bool CRepeaterProtocolHandler::writeData(const unsigned char* data, unsigned int
 
 #if defined(DUMP_TX)
 	CUtils::dump(wxT("Sending Data"), buffer, length + 9U);
-#endif
-
-	m_socket.SendTo(m_gatewayAddress, buffer, length + 9);
-	return m_socket.Error();
-}
-
-bool CRepeaterProtocolHandler::writeBusyHeader(const CHeaderData& header)
-{
-	unsigned char buffer[50U];
-
-	buffer[0] = 'D';
-	buffer[1] = 'S';
-	buffer[2] = 'R';
-	buffer[3] = 'P';
-
-	buffer[4] = 0x22U;
-
-	// Create a random id for this header
-	m_outId = (::rand() % 65535U) + 1U;
-
-	buffer[5] = m_outId / 256U;		// Unique session id
-	buffer[6] = m_outId % 256U;
-
-	buffer[7] = 0U;
-
-	buffer[8]  = header.getFlag1();
-	buffer[9]  = header.getFlag2();
-	buffer[10] = header.getFlag3();
-
-	for (unsigned int i = 0U; i < LONG_CALLSIGN_LENGTH; i++)
-		buffer[11 + i] = header.getRptCall1().GetChar(i);
-
-	for (unsigned int i = 0U; i < LONG_CALLSIGN_LENGTH; i++)
-		buffer[19 + i] = header.getRptCall2().GetChar(i);
-
-	for (unsigned int i = 0U; i < LONG_CALLSIGN_LENGTH; i++)
-		buffer[27 + i] = header.getYourCall().GetChar(i);
-
-	for (unsigned int i = 0U; i < LONG_CALLSIGN_LENGTH; i++)
-		buffer[35 + i] = header.getMyCall1().GetChar(i);
-
-	for (unsigned int i = 0U; i < SHORT_CALLSIGN_LENGTH; i++)
-		buffer[43 + i] = header.getMyCall2().GetChar(i);
-
-	// Get the checksum for the header
-	CCCITTChecksumReverse csum;
-	csum.update(buffer + 8U, 4U * LONG_CALLSIGN_LENGTH + SHORT_CALLSIGN_LENGTH + 3U);
-	csum.result(buffer + 47U);
-
-	m_outSeq = 0U;
-
-#if defined(DUMP_TX)
-	CUtils::dump(wxT("Sending Busy Header"), buffer, 49U);
-#endif
-
-	m_socket.SendTo(m_gatewayAddress, buffer, 49);
-	return m_socket.Error();
-}
-
-bool CRepeaterProtocolHandler::writeBusyData(const unsigned char* data, unsigned int length, unsigned int errors, bool end)
-{
-	wxASSERT(data != NULL);
-	wxASSERT(length == DV_FRAME_LENGTH_BYTES || length == DV_FRAME_MAX_LENGTH_BYTES);
-
-	unsigned char buffer[30U];
-
-	buffer[0] = 'D';
-	buffer[1] = 'S';
-	buffer[2] = 'R';
-	buffer[3] = 'P';
-
-	buffer[4] = 0x23U;
-
-	buffer[5] = m_outId / 256U;	// Unique session id
-	buffer[6] = m_outId % 256U;
-
-	// If this is a data sync, reset the sequence to zero
-	if (data[9] == 0x55 && data[10] == 0x2D && data[11] == 0x16)
-		m_outSeq = 0U;
-
-	buffer[7] = m_outSeq;
-	if (end)
-		buffer[7] |= 0x40U;			// End of data marker
-
-	buffer[8] = errors;
-
-	m_outSeq++;
-	if (m_outSeq > 0x14U)
-		m_outSeq = 0U;
-
-	::memcpy(buffer + 9U, data, length);
-
-#if defined(DUMP_TX)
-	CUtils::dump(wxT("Sending Busy Data"), buffer, length + 9U);
 #endif
 
 	m_socket.SendTo(m_gatewayAddress, buffer, length + 9);

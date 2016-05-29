@@ -613,7 +613,7 @@ bool CDStarRepeaterTXRXThread::processRadioHeader(CHeaderData* header)
 		netHeader.setRptCall1(m_rxHeader->getRptCall2());
 		netHeader.setRptCall2(m_rxHeader->getRptCall1());
 
-		m_protocolHandler->writeHeader(netHeader);
+		m_protocolHandler->write(netHeader);
 	} else {
 		delete header;
 	}
@@ -679,10 +679,10 @@ void CDStarRepeaterTXRXThread::processRadioFrame(unsigned char* data, FRAME_TYPE
 		unsigned char bytes[DV_FRAME_MAX_LENGTH_BYTES];
 		::memcpy(bytes, NULL_AMBE_DATA_BYTES, VOICE_FRAME_LENGTH_BYTES);
 		::memcpy(bytes + VOICE_FRAME_LENGTH_BYTES, END_PATTERN_BYTES, END_PATTERN_LENGTH_BYTES);
-		m_protocolHandler->writeData(bytes, DV_FRAME_MAX_LENGTH_BYTES, 0U, true);
+		m_protocolHandler->write(bytes, DV_FRAME_MAX_LENGTH_BYTES, 0U, true);
 	} else {
 		// Send the data to the network
-		m_protocolHandler->writeData(data, DV_FRAME_LENGTH_BYTES, errors, false);
+		m_protocolHandler->write(data, DV_FRAME_LENGTH_BYTES, errors, false);
 	}
 }
 

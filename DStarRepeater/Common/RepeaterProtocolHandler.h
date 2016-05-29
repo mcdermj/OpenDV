@@ -32,10 +32,9 @@ public:
 	 			 const wxString& name);
 	~CRepeaterProtocolHandler();
 
-	bool writeHeader(const CHeaderData& header);
-	bool writeBusyHeader(const CHeaderData& header);
-	bool writeData(const unsigned char* data, unsigned int length, unsigned int errors, bool end);
-	bool writeBusyData(const unsigned char* data, unsigned int length, unsigned int errors, bool end);
+	bool write(const CHeaderData& header, bool busy=false);
+	bool write(const unsigned char* data, unsigned int length,
+		unsigned int errors, bool end, bool busy=false);
 	bool writePoll(const wxString& text);
 	bool writeRegister();
 
