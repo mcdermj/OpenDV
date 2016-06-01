@@ -33,7 +33,7 @@ public:
 	~CRepeaterProtocolHandler();
 
 	bool write(const CHeaderData& header, bool busy=false);
-	bool write(const unsigned char* data, unsigned int length,
+	bool write(const void* data, unsigned int length,
 		unsigned int errors, bool end, bool busy=false);
 	bool writePoll(const wxString& text);
 	bool writeRegister();

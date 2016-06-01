@@ -17,6 +17,7 @@
  */
 
 #include <stdexcept>
+#include <stdint.h>
 
 #include "RepeaterProtocolHandler.h"
 #include "CCITTChecksumReverse.h"
@@ -26,6 +27,45 @@
 // #define	DUMP_TX
 
 const unsigned int BUFFER_LENGTH = 255U;
+
+#pragma pack(push, 1)
+struct gatewayPacket {
+    char magic[4];
+    unsigned char packetType;
+    union {
+        struct {
+            uint16_t streamId;
+            uint8_t lastPacket;
+            uint8_t flags[3];
+            char rpt1Call[8];
+            char rpt2Call[8];
+            char urCall[8];
+            char myCall[8];
+            char myCall2[4];
+            uint16_t checksum;
+        } dstarHeader;
+        struct {
+            uint16_t streamId;
+            uint8_t sequence;
+            uint8_t errors;
+            uint8_t ambeData[9];
+            uint8_t slowData[3];
+        } dstarData;
+        struct {
+            char local[20];
+            char status;
+            char reflector[8];
+        } networkText;
+        char pollText[250];
+    };
+};
+#pragma pack(pop)
+
+static const char GW_PACKET_TYPE_HEADER = 0x20;
+static const char GW_PACKET_TYPE_DATA = 0x21;
+static const char GW_PACKET_TYPE_POLL = 0x0A;
+
+static const char SYNC_SEQUENCE[] = { 0x55, 0x2D, 0x16 };
 
 CRepeaterProtocolHandler::CRepeaterProtocolHandler(const wxIPV4address& localAddress, const wxIPV4address& gatewayAddress, const wxString& name) :
 m_socket(localAddress, wxSOCKET_REUSEADDR | wxSOCKET_NOWAIT),
@@ -50,56 +90,40 @@ CRepeaterProtocolHandler::~CRepeaterProtocolHandler()
 
 bool CRepeaterProtocolHandler::write(const CHeaderData& header, bool busy)
 {
-	unsigned char buffer[50U];
+	struct gatewayPacket packet = {};
 
-	buffer[0] = 'D';
-	buffer[1] = 'S';
-	buffer[2] = 'R';
-	buffer[3] = 'P';
+	memcpy(&packet.magic, "DSRP", sizeof(packet.magic));
+	packet.packetType = GW_PACKET_TYPE_HEADER;
+	if(busy)
+		packet.packetType |= 0x02;
 
-	buffer[4] = busy ? 0x22 : 0x20;
+	m_outId = (rand() % 65535) + 1;
+	packet.dstarHeader.streamId = wxUINT16_SWAP_ON_LE(m_outId);
 
-	// Create a random id for this transmission
-	m_outId = (::rand() % 65535U) + 1U;
+	//  XXX modify method on the header class to array-ize these
+	packet.dstarHeader.flags[0] = header.getFlag1();
+	packet.dstarHeader.flags[1] = header.getFlag2();
+	packet.dstarHeader.flags[2] = header.getFlag3();
 
-	buffer[5] = m_outId / 256U;	// Unique session id
-	buffer[6] = m_outId % 256U;
+	strncpy(packet.dstarHeader.rpt1Call, header.getRptCall1().c_str(), LONG_CALLSIGN_LENGTH);
+	strncpy(packet.dstarHeader.rpt2Call, header.getRptCall2().c_str(), LONG_CALLSIGN_LENGTH);
+	strncpy(packet.dstarHeader.urCall, header.getYourCall().c_str(), LONG_CALLSIGN_LENGTH);
+	strncpy(packet.dstarHeader.myCall, header.getMyCall1().c_str(), LONG_CALLSIGN_LENGTH);
+	strncpy(packet.dstarHeader.myCall2, header.getMyCall2().c_str(), SHORT_CALLSIGN_LENGTH);
 
-	buffer[7] = 0U;
-
-	buffer[8]  = header.getFlag1();
-	buffer[9]  = header.getFlag2();
-	buffer[10] = header.getFlag3();
-
-	for (unsigned int i = 0U; i < LONG_CALLSIGN_LENGTH; i++)
-		buffer[11 + i] = header.getRptCall1().GetChar(i);
-
-	for (unsigned int i = 0U; i < LONG_CALLSIGN_LENGTH; i++)
-		buffer[19 + i] = header.getRptCall2().GetChar(i);
-
-	for (unsigned int i = 0U; i < LONG_CALLSIGN_LENGTH; i++)
-		buffer[27 + i] = header.getYourCall().GetChar(i);
-
-	for (unsigned int i = 0U; i < LONG_CALLSIGN_LENGTH; i++)
-		buffer[35 + i] = header.getMyCall1().GetChar(i);
-
-	for (unsigned int i = 0U; i < SHORT_CALLSIGN_LENGTH; i++)
-		buffer[43 + i] = header.getMyCall2().GetChar(i);
-
-	// Get the checksum for the header
+	//  XXX The method should probably take void * as the data
 	CCCITTChecksumReverse csum;
-	csum.update(buffer + 8U, 4U * LONG_CALLSIGN_LENGTH + SHORT_CALLSIGN_LENGTH + 3U);
-	csum.result(buffer + 47U);
+	csum.update((const unsigned char *) &packet.dstarHeader.flags, 4 * LONG_CALLSIGN_LENGTH + SHORT_CALLSIGN_LENGTH + 3);
+	csum.result((unsigned char *) &packet.dstarHeader.checksum);
 
-	m_outSeq = 0U;
+	m_outSeq = 0;
 
 #if defined(DUMP_TX)
-	CUtils::dump(wxT("Sending Header"), buffer, 49U);
+	CUtils::dump(wxS("Sending Header"), (const unsigned char *) &packet, 49);
 #endif
 
-	//  XXX I don't know why we send two packets here...
-	for (int i = 0U; i < (busy ? 1 : 2); i++) {
-		m_socket.SendTo(m_gatewayAddress, buffer, 49);
+	for(int i = 0; i < 2; ++i) {
+		m_socket.SendTo(m_gatewayAddress, &packet, 49);
 		if(m_socket.Error())
 			return false;
 	}
@@ -107,44 +131,40 @@ bool CRepeaterProtocolHandler::write(const CHeaderData& header, bool busy)
 	return true;
 }
 
-bool CRepeaterProtocolHandler::write(const unsigned char* data, unsigned int length, unsigned int errors, bool end, bool busy)
+bool CRepeaterProtocolHandler::write(const void* data, unsigned int length, unsigned int errors, bool end, bool busy)
 {
 	wxASSERT(data != NULL);
 	wxASSERT(length == DV_FRAME_LENGTH_BYTES || length == DV_FRAME_MAX_LENGTH_BYTES);
 
-	unsigned char buffer[30U];
+	struct gatewayPacket packet = {};
+	const char *slowData = (const char *)data + 9;
 
-	buffer[0] = 'D';
-	buffer[1] = 'S';
-	buffer[2] = 'R';
-	buffer[3] = 'P';
+	memcpy(&packet.magic, "DSRP", sizeof(packet.magic));
+	packet.packetType = GW_PACKET_TYPE_DATA;
+	if(busy)
+		packet.packetType |= 0x02;
 
-	buffer[4] = busy ? 0x23 : 0x21;
+	packet.dstarData.streamId = wxUINT16_SWAP_ON_LE(m_outId);
 
-	buffer[5] = m_outId / 256U;	// Unique session id
-	buffer[6] = m_outId % 256U;
+	if(!memcmp(slowData, SYNC_SEQUENCE, 3))
+		m_outSeq = 0;
 
-	// If this is a data sync, reset the sequence to zero
-	if (data[9] == 0x55 && data[10] == 0x2D && data[11] == 0x16)
-		m_outSeq = 0U;
+	packet.dstarData.sequence = m_outSeq;
+	if(end)
+		packet.dstarData.sequence |= 0x40;
 
-	buffer[7] = m_outSeq;
-	if (end)
-		buffer[7] |= 0x40U;			// End of data marker
+	packet.dstarData.errors = errors;
 
-	buffer[8] = errors;
+	if(++m_outSeq > 0x14U)
+		m_outSeq = 0;
 
-	m_outSeq++;
-	if (m_outSeq > 0x14U)
-		m_outSeq = 0U;
-
-	::memcpy(buffer + 9U, data, length);
+	memcpy(&packet.dstarData.ambeData, data, length);
 
 #if defined(DUMP_TX)
-	CUtils::dump(wxT("Sending Data"), buffer, length + 9U);
+	CUtils::dump(wxT("Sending Data"), &packet, length + 9);
 #endif
 
-	m_socket.SendTo(m_gatewayAddress, buffer, length + 9);
+	m_socket.SendTo(m_gatewayAddress, &packet, length + 9);
 	return m_socket.Error();
 }
 
