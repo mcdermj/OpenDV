@@ -95,6 +95,20 @@ CExternalController(NULL, false),
 m_mode(mode),
 m_pttPin(PTT_PIN)
 {
+	m_productId = getNWDRProductID();
+
+	switch(m_productId) {
+		case UDRC_PRODUCT_ID:
+			wxLogError("UDRCController: NWDR UDRC Detected");
+			break;
+		case UDRC_II_PRODUCT_ID:
+			wxLogError("UDRCController: NWDR UDRX II Detected");
+			break;
+		default:
+			wxLogError("UDRCController: Unknown product Detected");
+			break;
+	}
+
 }
 
 void CUDRCController::switchMode(enum repeater_modes mode) {
@@ -124,6 +138,9 @@ void CUDRCController::switchMode(enum repeater_modes mode) {
 
 bool CUDRCController::open()
 {
+	if(m_productId == -1)
+		return false;
+
 	if(::wiringPiSetupGpio() != 0) {
 		wxLogError("Unable to initialize the wiringPi library");
 		return false;
@@ -149,7 +166,7 @@ bool CUDRCController::open()
 		::digitalWrite(BASE_PIN, HIGH);
 	} else {
 		//  On a UDRC II in Hotspot mode, the PTT is on EXT3_PIN instead
-		switch(getNWDRProductID()) {
+		switch(m_productId) {
 			case UDRC_PRODUCT_ID:
 				m_pttPin = PTT_PIN;
 				break;
@@ -180,9 +197,10 @@ bool CUDRCController::getDisable() const
 
 void CUDRCController::setRadioTransmit(bool value)
 {
-	//  If we're in hotspot mode, we're using the miniDIN connector that is
-	//  reversed from the normal sense of PTT.
-	if(m_mode == HOTSPOT)
+	//  The UDRC II HD15 and any of the UDRC series DIN connectors have an
+	//  open collector transistor to buffer their outputs.  That reverses
+	//  the sense of the GPIO.  We account for that here.
+	if(m_mode == HOTSPOT || m_productId == UDRC_II_PRODUCT_ID)
 		value = !value;
 
 	::digitalWrite(m_pttPin, value ? LOW : HIGH);
@@ -202,8 +220,6 @@ void CUDRCController::setActive(bool value)
 	}
 }
 
-//  This needs to be overridden for now because the base class, ExternalController
-//  will try to dork around with threads that we're not using anymore.
 void CUDRCController::close()
 {
 	if(m_mode == HOTSPOT) {
