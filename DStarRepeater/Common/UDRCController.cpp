@@ -102,7 +102,7 @@ m_pttPin(PTT_PIN)
 			wxLogError("UDRCController: NWDR UDRC Detected");
 			break;
 		case UDRC_II_PRODUCT_ID:
-			wxLogError("UDRCController: NWDR UDRX II Detected");
+			wxLogError("UDRCController: NWDR UDRC II Detected");
 			break;
 		default:
 			wxLogError("UDRCController: Unknown product Detected");
