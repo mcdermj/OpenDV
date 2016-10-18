@@ -43,16 +43,23 @@ const wxChar*       GUI_SWITCH = wxT("gui");
 const wxChar*    LOGDIR_OPTION = wxT("logdir");
 const wxChar*   CONFDIR_OPTION = wxT("confdir");
 
+#if (wxUSE_GUI == 1)
 const wxString LOG_BASE_NAME    = wxT("ircddbgateway");
+#else
+const wxString LOG_BASE_NAME    = wxT("ircddbgatewayd");
+#endif
+
 
 CIRCDDBGatewayApp::CIRCDDBGatewayApp() :
+#if (wxUSE_GUI == 1)
+m_frame(NULL),
+#endif
 wxApp(),
 m_name(),
 m_nolog(false),
 m_gui(false),
 m_logDir(),
 m_confDir(),
-m_frame(NULL),
 m_thread(NULL),
 m_config(NULL),
 m_checker(NULL),
@@ -125,6 +132,7 @@ bool CIRCDDBGatewayApp::OnInit()
 	m_config = new CIRCDDBGatewayConfig(m_confDir, CONFIG_FILE_NAME, m_name);
 #endif
 
+#if (wxUSE_GUI == 1)
 	wxString frameName = APPLICATION_NAME + wxT(" - ");
 	if (!m_name.IsEmpty()) {
 		frameName.Append(m_name);
@@ -143,6 +151,7 @@ bool CIRCDDBGatewayApp::OnInit()
 	m_frame->Show();
 
 	SetTopWindow(m_frame);
+#endif
 
 	wxLogInfo(wxT("Starting ") + APPLICATION_NAME + wxT(" - ") + VERSION);
 
@@ -161,7 +170,9 @@ int CIRCDDBGatewayApp::OnExit()
 	wxLogInfo(APPLICATION_NAME + wxT(" is exiting"));
 
 	//m_thread->kill();
+#if (wxUSE_GUI == 1)
 	wxGetApp().GetTopWindow()->Close();
+#endif
 
 	delete m_config;
 
@@ -214,7 +225,9 @@ void CIRCDDBGatewayApp::OnAssertFailure(const wxChar* file, int line, const wxCh
 
 void CIRCDDBGatewayApp::showLog(const wxString& text)
 {
+#if (wxUSE_GUI == 1)
 	m_frame->showLog(text);
+#endif
 }
 
 CIRCDDBGatewayStatusData* CIRCDDBGatewayApp::getStatus() const
@@ -663,7 +676,7 @@ void CIRCDDBGatewayApp::createThread()
 
 	ircDDBAtLeastOneEnabled = ircDDBEnabled1 || ircDDBEnabled2 || ircDDBEnabled3 || ircDDBEnabled4;
 
-	if (ircDDBAtLeastOneEnabled) { 
+	if (ircDDBAtLeastOneEnabled) {
 #if defined(__WINDOWS__)
 		wxString versionInfo = wxT("win_") + LOG_BASE_NAME + wxT("-") + VERSION;
 #else

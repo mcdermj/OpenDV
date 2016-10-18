@@ -100,7 +100,7 @@ void *CReflectorLookupThread::Entry() {
 		hostFileName.Assign(DATA_DIR, fileName);
 #endif
 		if(!hostFileName.IsFileReadable()) {
-			wxPrintf("Could not find host file %s", fileName);
+			wxLogError("Could not find host file %s", fileName);
 
 			return 0;
 		}
@@ -130,13 +130,13 @@ void *CReflectorLookupThread::Entry() {
 
 	switch(m_protocol) {
 		case DP_DPLUS:
-			wxPrintf("Loaded %u of %u D-Plus reflectors from %s\n", count, hostFile.getCount(), hostFileName.GetFullPath());
+			wxLogMessage("Loaded %u of %u D-Plus reflectors from %s\n", count, hostFile.getCount(), hostFileName.GetFullPath());
 			break;
 		case DP_DEXTRA:
-			wxPrintf("Loaded %u of %u DExtra reflectors from %s\n", count, hostFile.getCount(), hostFileName.GetFullPath());
+			wxLogMessage("Loaded %u of %u DExtra reflectors from %s\n", count, hostFile.getCount(), hostFileName.GetFullPath());
 			break;
 		case DP_DCS:
-			wxPrintf("Loaded %u of %u DCS reflectors from %s\n", count, hostFile.getCount(), hostFileName.GetFullPath());
+			wxLogMessage("Loaded %u of %u DCS reflectors from %s\n", count, hostFile.getCount(), hostFileName.GetFullPath());
 			break;
 	}
 

@@ -22,7 +22,9 @@
 #include "IRCDDBGatewayThreadHelper.h"
 #include "IRCDDBGatewayStatusData.h"
 #include "IRCDDBGatewayConfig.h"
+#if (wxUSE_GUI == 1)
 #include "IRCDDBGatewayFrame.h"
+#endif
 #include "Defs.h"
 
 #include <wx/wx.h>
@@ -36,7 +38,7 @@ public:
 
 	virtual bool OnInit();
 	virtual int  OnExit();
-	
+
 	virtual void OnInitCmdLine(wxCmdLineParser& parser);
 	virtual bool OnCmdLineParsed(wxCmdLineParser& parser);
 
@@ -57,7 +59,9 @@ private:
 	bool                        m_gui;
 	wxString                    m_logDir;
 	wxString                    m_confDir;
+#if (wxUSE_GUI == 1)
 	CIRCDDBGatewayFrame*        m_frame;
+#endif
 	CIRCDDBGatewayThreadHelper* m_thread;
 	CIRCDDBGatewayConfig*       m_config;
 	wxSingleInstanceChecker*    m_checker;

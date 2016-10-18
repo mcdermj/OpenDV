@@ -27,7 +27,7 @@ AM_PATH_WXCONFIG($reqwx, wxWin=1)
 if test "$wxWin" != 1; then
 	AC_MSG_ERROR([
 		wxWidgets must be installed on your system.
- 
+
 		Please check that wx-config is in path, the directory
 		where wxWidgets libraries are installed (returned by
 		'wx-config --libs' or 'wx-config --static --libs' command)
@@ -42,8 +42,8 @@ CFLAGS="$CFLAGS $WX_CFLAGS_ONLY"
 AC_SUBST([GUI_WX_CPPFLAGS], $WX_CPPFLAGS)
 AC_SUBST([GUI_WX_LIBS], $WX_LIBS)
 
-WX_CONFIG_CHECK($reqwx, wxWin=1, wxWin=0, [base])
-AC_SUBST([BASE_WX_CPPFLAGS], $WX_CPPFLAGS)
+WX_CONFIG_CHECK($reqwx, wxWin=1, wxWin=0, [base, net])
+AC_SUBST([BASE_WX_CPPFLAGS], "$WX_CPPFLAGS -DwxUSE_GUI=0")
 AC_SUBST([BASE_WX_LIBS], $WX_LIBS)
 
 # Checks for header files.

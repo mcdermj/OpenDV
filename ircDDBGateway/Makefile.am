@@ -1,24 +1,24 @@
 pkgsysconfdir = ${sysconfdir}/opendv
-pkgsysconf_DATA = 
+pkgsysconf_DATA =
 
 pkgdatadir = ${datadir}/opendv
 
 opendvlogdir = ${localstatedir}/log/opendv
-opendvlog_DATA = 
+opendvlog_DATA =
 
 DEFS += \
 	-DDATA_DIR=\"${pkgdatadir}\" \
 	-DLOG_DIR=\"${opendvlogdir}\" \
 	-DCONF_DIR=\"${pkgsysconfdir}\"
-    
+
 STARNETSERVER_COMMON = \
 	StarNetServer/StarNetServerConfig.cpp \
 	StarNetServer/StarNetServerThread.cpp
-	
+
 APRSTRANSMIT_COMMON = \
 	APRSTransmit/APRSParser.cpp \
 	APRSTransmit/APRSTransmit.cpp
-	
+
 TIMERCONTROL_COMMON = \
 	TimerControl/TimerControlConfig.cpp \
 	TimerControl/TimerControlItemFile.cpp \
@@ -96,7 +96,7 @@ libCommon_a_SOURCES = \
 	Common/UDPReaderWriter.cpp \
 	Common/UserCache.cpp \
 	Common/Utils.cpp \
-	Common/VersionUnit.cpp 
+	Common/VersionUnit.cpp
 libCommon_a_CPPFLAGS = -ICommon -IircDDB $(BASE_WX_CPPFLAGS)
 
 libircDDB_a_SOURCES = \
@@ -132,9 +132,11 @@ sbin_PROGRAMS = ircddbgatewayd starnetserverd aprstransmitd timercontrold timese
 bin_PROGRAMS = texttransmit voicetransmit aprstransmit remotecontrold
 
 ircddbgatewayd_SOURCES = \
-	ircDDBGateway/IRCDDBGatewayAppD.cpp \
+	ircDDBGateway/IRCDDBGatewayApp.cpp \
 	ircDDBGateway/IRCDDBGatewayStatusData.cpp \
-	ircDDBGateway/IRCDDBGatewayThread.cpp
+	ircDDBGateway/IRCDDBGatewayThread.cpp \
+	ircDDBGateway/IRCDDBGatewayThreadHelper.cpp \
+	ircDDBGateway/IRCDDBGatewayLogRedirect.cpp
 ircddbgatewayd_LDADD = $(BASE_WX_LIBS) libCommon.a libircDDB.a
 ircddbgatewayd_CPPFLAGS = -ICommon -IircDDB $(BASE_WX_CPPFLAGS)
 
@@ -263,7 +265,7 @@ remotecontrol_SOURCES = \
 	RemoteControl/RemoteControlRepeaterPanel.cpp \
 	RemoteControl/RemoteControlStarNetGroup.cpp \
 	RemoteControl/RemoteControlStarNetPanel.cpp \
-	RemoteControl/RemoteControlStarNetUser.cpp 
+	RemoteControl/RemoteControlStarNetUser.cpp
 remotecontrol_LDADD = $(GUI_WX_LIBS) libCommon.a libGUICommon.a
 remotecontrol_CPPFLAGS = -ICommon -IGUICommon $(GUI_WX_CPPFLAGS)
 
