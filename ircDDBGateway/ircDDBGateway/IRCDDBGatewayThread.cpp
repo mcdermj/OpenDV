@@ -43,6 +43,9 @@
 #include <wx/filename.h>
 #include <wx/textfile.h>
 #include <wx/ffile.h>
+#include <wx/socket.h>
+#include <wx/thread.h>
+
 
 #if defined(__WINDOWS__)
 #include "Inaddr.h"
@@ -53,6 +56,94 @@
 const wxString LOOPBACK_ADDRESS = wxT("127.0.0.1");
 
 const unsigned int REMOTE_DUMMY_PORT = 65016U;
+
+class CReflectorLookupThread : public wxThread
+{
+public:
+	CReflectorLookupThread(CIRCDDBGatewayThread *gatewayThread, DSTAR_PROTOCOL protocol)
+	: wxThread(wxTHREAD_DETACHED),
+	  m_gatewayThread(gatewayThread),
+	  m_protocol(protocol) { };
+	~CReflectorLookupThread() { };
+
+	virtual void *Entry();
+
+private:
+	CIRCDDBGatewayThread *m_gatewayThread;
+	DSTAR_PROTOCOL m_protocol;
+};
+
+
+void *CReflectorLookupThread::Entry() {
+	int count = 0;
+
+	wxString fileName;
+
+	switch(m_protocol) {
+		case DP_DPLUS:
+			fileName = DPLUS_HOSTS_FILE_NAME;
+			break;
+		case DP_DEXTRA:
+			fileName = DEXTRA_HOSTS_FILE_NAME;
+			break;
+		case DP_DCS:
+			fileName = DCS_HOSTS_FILE_NAME;
+			break;
+	}
+
+	wxFileName hostFileName(wxFileName::GetHomeDir(), fileName);
+
+	if(!hostFileName.IsFileReadable()) {
+#if defined(__WINDOWS__)
+		hostFileName.Assign(::wxGetCwd(), fileName);
+#else
+		hostFileName.Assign(DATA_DIR, fileName);
+#endif
+		if(!hostFileName.IsFileReadable()) {
+			wxPrintf("Could not find host file %s", fileName);
+
+			return 0;
+		}
+	}
+
+	CHostFile hostFile(hostFileName.GetFullPath(), false);
+
+	for (int i = 0; i < hostFile.getCount() && !TestDestroy(); i++) {
+		wxString reflector = hostFile.getName(i);
+		bool lock          = hostFile.getLock(i);
+
+		wxIPV4address reflectorAddress;
+		if (reflectorAddress.Hostname(hostFile.getAddress(i))) {
+			reflector.Append(wxT("        "));
+			reflector.Truncate(LONG_CALLSIGN_LENGTH - 1U);
+			reflector.Append(wxT("G"));
+
+			if (lock)
+				wxLogMessage("Locking %s to %s", reflector, reflectorAddress.IPAddress());
+
+			// wxLogMessage("%s: Found %s for %s\n", m_fileName, reflectorAddress.IPAddress(), reflector);
+			m_gatewayThread->m_cache.updateGateway(reflector, reflectorAddress.IPAddress(), m_protocol, lock, true);
+
+			count++;
+		}
+	}
+
+	switch(m_protocol) {
+		case DP_DPLUS:
+			wxPrintf("Loaded %u of %u D-Plus reflectors from %s\n", count, hostFile.getCount(), hostFileName.GetFullPath());
+			break;
+		case DP_DEXTRA:
+			wxPrintf("Loaded %u of %u DExtra reflectors from %s\n", count, hostFile.getCount(), hostFileName.GetFullPath());
+			break;
+		case DP_DCS:
+			wxPrintf("Loaded %u of %u DCS reflectors from %s\n", count, hostFile.getCount(), hostFileName.GetFullPath());
+			break;
+	}
+
+	return 0;
+}
+
+
 
 CIRCDDBGatewayThread::CIRCDDBGatewayThread(const wxString& logDir, const wxString& name) :
 m_logDir(logDir),
@@ -399,7 +490,7 @@ void CIRCDDBGatewayThread::run()
 					bool ret4 = CCCSHandler::stateChange();
 					if (ret1 || ret2 || ret3 || ret4)
 						writeStatus();
-		
+
 					m_statusTimer1.start();
 				}
 			}
@@ -1096,142 +1187,31 @@ void CIRCDDBGatewayThread::loadGateways()
 
 void CIRCDDBGatewayThread::loadReflectors()
 {
-	if (m_dplusEnabled) {
-		wxFileName fileName(wxFileName::GetHomeDir(), DPLUS_HOSTS_FILE_NAME);
-		if (fileName.IsFileReadable())
-			loadDPlusReflectors(fileName.GetFullPath());
+	CReflectorLookupThread *lookupThread;
 
-#if defined(__WINDOWS__)
-		fileName.Assign(::wxGetCwd(), DPLUS_HOSTS_FILE_NAME);
-#else
-		fileName.Assign(wxT(DATA_DIR), DPLUS_HOSTS_FILE_NAME);
-#endif
-		if (fileName.IsFileReadable())
-			loadDPlusReflectors(fileName.GetFullPath());
+	if (m_dplusEnabled) {
+		lookupThread = new CReflectorLookupThread(this, DP_DPLUS);
+		if(lookupThread->Run() != wxTHREAD_NO_ERROR) {
+			wxLogError("Couldn't launch D-Plus Lookup Thread");
+		}
 	}
 
 	if (m_dextraEnabled) {
-		wxFileName fileName(wxFileName::GetHomeDir(), DEXTRA_HOSTS_FILE_NAME);
-		if (fileName.IsFileReadable())
-			loadDExtraReflectors(fileName.GetFullPath());
-
-#if defined(__WINDOWS__)
-		fileName.Assign(::wxGetCwd(), DEXTRA_HOSTS_FILE_NAME);
-#else
-		fileName.Assign(wxT(DATA_DIR), DEXTRA_HOSTS_FILE_NAME);
-#endif
-		if (fileName.IsFileReadable())
-			loadDExtraReflectors(fileName.GetFullPath());
+		lookupThread = new CReflectorLookupThread(this, DP_DEXTRA);
+		if(lookupThread->Run() != wxTHREAD_NO_ERROR) {
+			wxLogError("Couldn't launch DExtra Lookup Thread");
+		}
 	}
 
 	if (m_dcsEnabled) {
-		wxFileName fileName(wxFileName::GetHomeDir(), DCS_HOSTS_FILE_NAME);
-		if (fileName.IsFileReadable())
-			loadDCSReflectors(fileName.GetFullPath());
-
-#if defined(__WINDOWS__)
-		fileName.Assign(::wxGetCwd(), DCS_HOSTS_FILE_NAME);
-#else
-		fileName.Assign(wxT(DATA_DIR), DCS_HOSTS_FILE_NAME);
-#endif
-		if (fileName.IsFileReadable())
-			loadDCSReflectors(fileName.GetFullPath());
-	}
-}
-
-void CIRCDDBGatewayThread::loadDExtraReflectors(const wxString& fileName)
-{
-	unsigned int count = 0U;
-
-	CHostFile hostFile(fileName, false);
-	for (unsigned int i = 0U; i < hostFile.getCount(); i++) {
-		wxString reflector = hostFile.getName(i);
-		in_addr address    = CUDPReaderWriter::lookup(hostFile.getAddress(i));
-		bool lock          = hostFile.getLock(i);
-
-		if (address.s_addr != INADDR_NONE) {
-			unsigned char* ucp = (unsigned char*)&address;
-
-			wxString addrText;
-			addrText.Printf(wxT("%u.%u.%u.%u"), ucp[0U] & 0xFFU, ucp[1U] & 0xFFU, ucp[2U] & 0xFFU, ucp[3U] & 0xFFU);
-
-			if (lock)
-				wxLogMessage(wxT("Locking %s to %s"), reflector.c_str(), addrText.c_str());
-
-			reflector.Append(wxT("        "));
-			reflector.Truncate(LONG_CALLSIGN_LENGTH - 1U);
-			reflector.Append(wxT("G"));
-			m_cache.updateGateway(reflector, addrText, DP_DEXTRA, lock, true);
-
-			count++;
+		lookupThread = new CReflectorLookupThread(this, DP_DCS);
+		if(lookupThread->Run() != wxTHREAD_NO_ERROR) {
+			wxLogError("Couldn't launch DCS Lookup Thread");
 		}
 	}
-
-	wxLogMessage(wxT("Loaded %u of %u DExtra reflectors from %s"), count, hostFile.getCount(), fileName.c_str());
 }
 
-void CIRCDDBGatewayThread::loadDPlusReflectors(const wxString& fileName)
-{
-	unsigned int count = 0U;
 
-	CHostFile hostFile(fileName, false);
-	for (unsigned int i = 0U; i < hostFile.getCount(); i++) {
-		wxString reflector = hostFile.getName(i);
-		in_addr address    = CUDPReaderWriter::lookup(hostFile.getAddress(i));
-		bool lock          = hostFile.getLock(i);
-
-		if (address.s_addr != INADDR_NONE) {
-			unsigned char* ucp = (unsigned char*)&address;
-
-			wxString addrText;
-			addrText.Printf(wxT("%u.%u.%u.%u"), ucp[0U] & 0xFFU, ucp[1U] & 0xFFU, ucp[2U] & 0xFFU, ucp[3U] & 0xFFU);
-
-			if (lock)
-				wxLogMessage(wxT("Locking %s to %s"), reflector.c_str(), addrText.c_str());
-
-			reflector.Append(wxT("        "));
-			reflector.Truncate(LONG_CALLSIGN_LENGTH - 1U);
-			reflector.Append(wxT("G"));
-			m_cache.updateGateway(reflector, addrText, DP_DPLUS, lock, true);
-
-			count++;
-		}
-	}
-
-	wxLogMessage(wxT("Loaded %u of %u D-Plus reflectors from %s"), count, hostFile.getCount(), fileName.c_str());
-}
-
-void CIRCDDBGatewayThread::loadDCSReflectors(const wxString& fileName)
-{
-	unsigned int count = 0U;
-
-	CHostFile hostFile(fileName, false);
-	for (unsigned int i = 0U; i < hostFile.getCount(); i++) {
-		wxString reflector = hostFile.getName(i);
-		in_addr address    = CUDPReaderWriter::lookup(hostFile.getAddress(i));
-		bool lock          = hostFile.getLock(i);
-
-		if (address.s_addr != INADDR_NONE) {
-			unsigned char* ucp = (unsigned char*)&address;
-
-			wxString addrText;
-			addrText.Printf(wxT("%u.%u.%u.%u"), ucp[0U] & 0xFFU, ucp[1U] & 0xFFU, ucp[2U] & 0xFFU, ucp[3U] & 0xFFU);
-
-			if (lock)
-				wxLogMessage(wxT("Locking %s to %s"), reflector.c_str(), addrText.c_str());
-
-			reflector.Append(wxT("        "));
-			reflector.Truncate(LONG_CALLSIGN_LENGTH - 1U);
-			reflector.Append(wxT("G"));
-			m_cache.updateGateway(reflector, addrText, DP_DCS, lock, true);
-
-			count++;
-		}
-	}
-
-	wxLogMessage(wxT("Loaded %u of %u DCS reflectors from %s"), count, hostFile.getCount(), fileName.c_str());
-}
-	
 void CIRCDDBGatewayThread::writeStatus()
 {
 	wxString fullName = LINKS_BASE_NAME;

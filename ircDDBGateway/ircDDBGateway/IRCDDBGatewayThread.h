@@ -39,6 +39,8 @@
 #include <wx/wx.h>
 
 class CIRCDDBGatewayThread {
+	friend class CReflectorLookupThread;
+
 public:
 	CIRCDDBGatewayThread(const wxString& logDir, const wxString& name);
 	virtual ~CIRCDDBGatewayThread();
