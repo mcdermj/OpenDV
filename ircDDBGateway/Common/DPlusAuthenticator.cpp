@@ -37,8 +37,7 @@ m_gatewayCallsign(gatewayCallsign),
 m_address(address),
 m_cache(cache),
 m_timer(1U, 6U * 3600U),		// 6 hours
-m_pollTimer(1U, 60U),			// 1 minute
-m_killed(false)
+m_pollTimer(1U, 60U)			// 1 minute
 {
 	wxASSERT(!loginCallsign.IsEmpty());
 	wxASSERT(!gatewayCallsign.IsEmpty());
@@ -57,12 +56,6 @@ CDPlusAuthenticator::~CDPlusAuthenticator()
 {
 }
 
-void CDPlusAuthenticator::start()
-{
-	Create();
-	Run();
-}
-
 void* CDPlusAuthenticator::Entry()
 {
 	wxLogMessage(wxT("Starting the D-Plus Authenticator thread"));
@@ -74,7 +67,7 @@ void* CDPlusAuthenticator::Entry()
 	m_pollTimer.start();
 
 	try {
-		while (!m_killed) {
+		while (!TestDestroy()) {
 			if (m_pollTimer.hasExpired()) {
 				poll(m_gatewayCallsign, DUTCHSTAR_HOSTNAME, DUTCHSTAR_PORT, 'K');
 				m_pollTimer.start();
@@ -103,13 +96,6 @@ void* CDPlusAuthenticator::Entry()
 	wxLogMessage(wxT("Stopping the D-Plus Authenticator thread"));
 
 	return NULL;
-}
-
-void CDPlusAuthenticator::stop()
-{
-	m_killed = true;
-
-	Wait();
 }
 
 bool CDPlusAuthenticator::authenticate(const wxString& callsign, const wxString& hostname, unsigned int port, unsigned char id, bool writeToCache)
@@ -178,7 +164,7 @@ bool CDPlusAuthenticator::authenticate(const wxString& callsign, const wxString&
 			CUtils::dump(wxT("Details:"), buffer, len);
 			break;
 		}
-	
+
 		for (unsigned int i = 8U; (i + 25U) < len; i += 26U) {
 			wxString address = wxString((char*)(buffer + i + 0U),  wxConvLocal, 16U);
 			wxString    name = wxString((char*)(buffer + i + 16U), wxConvLocal, LONG_CALLSIGN_LENGTH);

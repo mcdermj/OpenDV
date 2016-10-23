@@ -36,11 +36,7 @@ public:
 	CDPlusAuthenticator(const wxString& loginCallsign, const wxString& gatewayCallsign, const wxString& address, CCacheManager* cache);
 	virtual ~CDPlusAuthenticator();
 
-	virtual void  start();
-
 	virtual void* Entry();
-
-	virtual void stop();
 
 private:
 	wxString       m_loginCallsign;
@@ -49,7 +45,6 @@ private:
 	CCacheManager* m_cache;
 	CTimer         m_timer;
 	CTimer         m_pollTimer;
-	bool           m_killed;
 
 	bool poll(const wxString& callsign, const wxString& hostname, unsigned int port, unsigned char id);
 	bool authenticate(const wxString& callsign, const wxString& hostname, unsigned int port, unsigned char id, bool writeToCache);

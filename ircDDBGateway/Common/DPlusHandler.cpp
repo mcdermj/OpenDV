@@ -134,7 +134,7 @@ void CDPlusHandler::startAuthenticator(const wxString& address, CCacheManager* c
 	wxASSERT(cache != NULL);
 
 	m_authenticator = new CDPlusAuthenticator(m_dplusLogin, m_gatewayCallsign, address, cache);
-	m_authenticator->start();
+	m_authenticator->Run();
 }
 
 void CDPlusHandler::setCallsign(const wxString& callsign)
@@ -232,7 +232,7 @@ void CDPlusHandler::process(CHeaderData& header)
 				return;
 			}
 		}
-	}	
+	}
 }
 
 void CDPlusHandler::process(CAMBEData& data)
@@ -252,7 +252,7 @@ void CDPlusHandler::process(CAMBEData& data)
 				return;
 			}
 		}
-	}	
+	}
 }
 
 void CDPlusHandler::process(const CPollData& poll)
@@ -272,7 +272,7 @@ void CDPlusHandler::process(const CPollData& poll)
 				return;
 			}
 		}
-	}	
+	}
 
 	// If we cannot find an existing link, we ignore the poll
 	wxLogMessage(wxT("Incoming poll from unknown D-Plus dongle"));
@@ -393,7 +393,7 @@ void CDPlusHandler::relink(IReflectorCallback* handler, const wxString &gateway)
 				return;
 			}
 		}
-	}	
+	}
 }
 
 void CDPlusHandler::unlink(IReflectorCallback* handler, const wxString& callsign, bool exclude)
@@ -480,7 +480,7 @@ void CDPlusHandler::unlink()
 			reflector->m_pollInactivityTimer.stop();
 			reflector->m_tryCount = 0U;
 		}
-	}	
+	}
 }
 
 void CDPlusHandler::writeHeader(IReflectorCallback* handler, CHeaderData& header, DIRECTION direction)
@@ -488,7 +488,7 @@ void CDPlusHandler::writeHeader(IReflectorCallback* handler, CHeaderData& header
 	for (unsigned int i = 0U; i < m_maxReflectors; i++) {
 		if (m_reflectors[i] != NULL)
 			m_reflectors[i]->writeHeaderInt(handler, header, direction);
-	}	
+	}
 }
 
 void CDPlusHandler::writeAMBE(IReflectorCallback* handler, CAMBEData& data, DIRECTION direction)
@@ -496,7 +496,7 @@ void CDPlusHandler::writeAMBE(IReflectorCallback* handler, CAMBEData& data, DIRE
 	for (unsigned int i = 0U; i < m_maxReflectors; i++) {
 		if (m_reflectors[i] != NULL)
 			m_reflectors[i]->writeAMBEInt(handler, data, direction);
-	}	
+	}
 }
 
 void CDPlusHandler::gatewayUpdate(const wxString& gateway, const wxString& address)
@@ -545,7 +545,7 @@ void CDPlusHandler::clock(unsigned int ms)
 void CDPlusHandler::finalise()
 {
 	if (m_authenticator != NULL)
-		m_authenticator->stop();
+		m_authenticator->Delete();
 
 	for (unsigned int i = 0U; i < m_maxReflectors; i++)
 		delete m_reflectors[i];
@@ -915,13 +915,13 @@ void CDPlusHandler::writeStatus(wxFFile& file)
 				switch (reflector->m_direction) {
 					case DIR_OUTGOING:
 						text.Printf(wxT("%04d-%02d-%02d %02d:%02d:%02d: DPlus link - Type: Dongle Rptr: %s Refl: %s Dir: Outgoing\n"),
-							tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec, 
+							tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec,
 							reflector->m_repeater.c_str(), reflector->m_reflector.c_str());
 						break;
 
 					case DIR_INCOMING:
 						text.Printf(wxT("%04d-%02d-%02d %02d:%02d:%02d: DPlus link - Type: Dongle User: %s Dir: Incoming\n"),
-							tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec, 
+							tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec,
 							reflector->m_reflector.c_str());
 						break;
 				}

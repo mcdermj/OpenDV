@@ -32,8 +32,7 @@ wxThread(wxTHREAD_JOINABLE),
 m_callsign(callsign),
 m_address(address),
 m_cache(cache),
-m_timer(1U, 1U * 3600U),		// 1 hour
-m_killed(false)
+m_timer(1U, 1U * 3600U)		// 1 hour
 {
 	wxASSERT(!callsign.IsEmpty());
 	wxASSERT(cache != NULL);
@@ -43,22 +42,16 @@ CCallsignServer::~CCallsignServer()
 {
 }
 
-void CCallsignServer::start()
-{
-	process(CALLSERVER_HOSTNAME, CALLSERVER_PORT);
-
-	Create();
-	Run();
-}
-
 void* CCallsignServer::Entry()
 {
 	wxLogMessage(wxT("Starting the Callsign Server thread"));
 
+	process(CALLSERVER_HOSTNAME, CALLSERVER_PORT);
+
 	m_timer.start();
 
 	try {
-		while (!m_killed) {
+		while (!TestDestroy()) {
 			if (m_timer.hasExpired()) {
 				process(CALLSERVER_HOSTNAME, CALLSERVER_PORT);
 				m_timer.start();
@@ -80,13 +73,6 @@ void* CCallsignServer::Entry()
 	wxLogMessage(wxT("Stopping the Callsign Server thread"));
 
 	return NULL;
-}
-
-void CCallsignServer::stop()
-{
-	m_killed = true;
-
-	Wait();
 }
 
 void CCallsignServer::process(const wxString& hostname, unsigned int port)

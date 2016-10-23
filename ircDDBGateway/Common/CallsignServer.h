@@ -35,18 +35,13 @@ public:
 	CCallsignServer(const wxString& callsign, const wxString& address, CCacheManager* cache);
 	virtual ~CCallsignServer();
 
-	virtual void  start();
-
 	virtual void* Entry();
-
-	virtual void  stop();
 
 private:
 	wxString       m_callsign;
 	wxString       m_address;
 	CCacheManager* m_cache;
 	CTimer         m_timer;
-	bool           m_killed;
 
 	void process(const wxString& hostname, unsigned int port);
 };
