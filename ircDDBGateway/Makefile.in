@@ -229,13 +229,11 @@ aprstransmitd_DEPENDENCIES = $(am__DEPENDENCIES_1) libCommon.a
 am__ircddbgateway_SOURCES_DIST = ircDDBGateway/IRCDDBGatewayApp.cpp \
 	ircDDBGateway/IRCDDBGatewayFrame.cpp \
 	ircDDBGateway/IRCDDBGatewayLogRedirect.cpp \
-	ircDDBGateway/IRCDDBGatewayThreadHelper.cpp \
 	ircDDBGateway/IRCDDBGatewayStatusData.cpp \
 	ircDDBGateway/IRCDDBGatewayThread.cpp
 @WITH_GUI_TRUE@am_ircddbgateway_OBJECTS = ircDDBGateway/ircddbgateway-IRCDDBGatewayApp.$(OBJEXT) \
 @WITH_GUI_TRUE@	ircDDBGateway/ircddbgateway-IRCDDBGatewayFrame.$(OBJEXT) \
 @WITH_GUI_TRUE@	ircDDBGateway/ircddbgateway-IRCDDBGatewayLogRedirect.$(OBJEXT) \
-@WITH_GUI_TRUE@	ircDDBGateway/ircddbgateway-IRCDDBGatewayThreadHelper.$(OBJEXT) \
 @WITH_GUI_TRUE@	ircDDBGateway/ircddbgateway-IRCDDBGatewayStatusData.$(OBJEXT) \
 @WITH_GUI_TRUE@	ircDDBGateway/ircddbgateway-IRCDDBGatewayThread.$(OBJEXT)
 ircddbgateway_OBJECTS = $(am_ircddbgateway_OBJECTS)
@@ -260,7 +258,6 @@ am_ircddbgatewayd_OBJECTS =  \
 	ircDDBGateway/ircddbgatewayd-IRCDDBGatewayApp.$(OBJEXT) \
 	ircDDBGateway/ircddbgatewayd-IRCDDBGatewayStatusData.$(OBJEXT) \
 	ircDDBGateway/ircddbgatewayd-IRCDDBGatewayThread.$(OBJEXT) \
-	ircDDBGateway/ircddbgatewayd-IRCDDBGatewayThreadHelper.$(OBJEXT) \
 	ircDDBGateway/ircddbgatewayd-IRCDDBGatewayLogRedirect.$(OBJEXT)
 ircddbgatewayd_OBJECTS = $(am_ircddbgatewayd_OBJECTS)
 ircddbgatewayd_DEPENDENCIES = $(am__DEPENDENCIES_1) libCommon.a \
@@ -770,7 +767,6 @@ ircddbgatewayd_SOURCES = \
 	ircDDBGateway/IRCDDBGatewayApp.cpp \
 	ircDDBGateway/IRCDDBGatewayStatusData.cpp \
 	ircDDBGateway/IRCDDBGatewayThread.cpp \
-	ircDDBGateway/IRCDDBGatewayThreadHelper.cpp \
 	ircDDBGateway/IRCDDBGatewayLogRedirect.cpp
 
 ircddbgatewayd_LDADD = $(BASE_WX_LIBS) libCommon.a libircDDB.a
@@ -868,7 +864,6 @@ pkgdata_DATA = \
 @WITH_GUI_TRUE@	ircDDBGateway/IRCDDBGatewayApp.cpp \
 @WITH_GUI_TRUE@    ircDDBGateway/IRCDDBGatewayFrame.cpp \
 @WITH_GUI_TRUE@    ircDDBGateway/IRCDDBGatewayLogRedirect.cpp \
-@WITH_GUI_TRUE@    ircDDBGateway/IRCDDBGatewayThreadHelper.cpp \
 @WITH_GUI_TRUE@    ircDDBGateway/IRCDDBGatewayStatusData.cpp \
 @WITH_GUI_TRUE@	ircDDBGateway/IRCDDBGatewayThread.cpp
 
@@ -1317,9 +1312,6 @@ ircDDBGateway/ircddbgateway-IRCDDBGatewayFrame.$(OBJEXT):  \
 ircDDBGateway/ircddbgateway-IRCDDBGatewayLogRedirect.$(OBJEXT):  \
 	ircDDBGateway/$(am__dirstamp) \
 	ircDDBGateway/$(DEPDIR)/$(am__dirstamp)
-ircDDBGateway/ircddbgateway-IRCDDBGatewayThreadHelper.$(OBJEXT):  \
-	ircDDBGateway/$(am__dirstamp) \
-	ircDDBGateway/$(DEPDIR)/$(am__dirstamp)
 ircDDBGateway/ircddbgateway-IRCDDBGatewayStatusData.$(OBJEXT):  \
 	ircDDBGateway/$(am__dirstamp) \
 	ircDDBGateway/$(DEPDIR)/$(am__dirstamp)
@@ -1362,9 +1354,6 @@ ircDDBGateway/ircddbgatewayd-IRCDDBGatewayStatusData.$(OBJEXT):  \
 	ircDDBGateway/$(am__dirstamp) \
 	ircDDBGateway/$(DEPDIR)/$(am__dirstamp)
 ircDDBGateway/ircddbgatewayd-IRCDDBGatewayThread.$(OBJEXT):  \
-	ircDDBGateway/$(am__dirstamp) \
-	ircDDBGateway/$(DEPDIR)/$(am__dirstamp)
-ircDDBGateway/ircddbgatewayd-IRCDDBGatewayThreadHelper.$(OBJEXT):  \
 	ircDDBGateway/$(am__dirstamp) \
 	ircDDBGateway/$(DEPDIR)/$(am__dirstamp)
 ircDDBGateway/ircddbgatewayd-IRCDDBGatewayLogRedirect.$(OBJEXT):  \
@@ -1824,12 +1813,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@ircDDBGateway/$(DEPDIR)/ircddbgateway-IRCDDBGatewayLogRedirect.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@ircDDBGateway/$(DEPDIR)/ircddbgateway-IRCDDBGatewayStatusData.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@ircDDBGateway/$(DEPDIR)/ircddbgateway-IRCDDBGatewayThread.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@ircDDBGateway/$(DEPDIR)/ircddbgateway-IRCDDBGatewayThreadHelper.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@ircDDBGateway/$(DEPDIR)/ircddbgatewayd-IRCDDBGatewayApp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@ircDDBGateway/$(DEPDIR)/ircddbgatewayd-IRCDDBGatewayLogRedirect.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@ircDDBGateway/$(DEPDIR)/ircddbgatewayd-IRCDDBGatewayStatusData.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@ircDDBGateway/$(DEPDIR)/ircddbgatewayd-IRCDDBGatewayThread.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@ircDDBGateway/$(DEPDIR)/ircddbgatewayd-IRCDDBGatewayThreadHelper.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@ircDDBGatewayConfig/$(DEPDIR)/ircddbgatewayconfig-IRCDDBGatewayConfigApp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@ircDDBGatewayConfig/$(DEPDIR)/ircddbgatewayconfig-IRCDDBGatewayConfigFrame.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@ircDDBGatewayConfig/$(DEPDIR)/ircddbgatewayconfig-IRCDDBGatewayConfigGatewaySet.Po@am__quote@
@@ -3210,20 +3197,6 @@ ircDDBGateway/ircddbgateway-IRCDDBGatewayLogRedirect.obj: ircDDBGateway/IRCDDBGa
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ircddbgateway_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ircDDBGateway/ircddbgateway-IRCDDBGatewayLogRedirect.obj `if test -f 'ircDDBGateway/IRCDDBGatewayLogRedirect.cpp'; then $(CYGPATH_W) 'ircDDBGateway/IRCDDBGatewayLogRedirect.cpp'; else $(CYGPATH_W) '$(srcdir)/ircDDBGateway/IRCDDBGatewayLogRedirect.cpp'; fi`
 
-ircDDBGateway/ircddbgateway-IRCDDBGatewayThreadHelper.o: ircDDBGateway/IRCDDBGatewayThreadHelper.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ircddbgateway_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ircDDBGateway/ircddbgateway-IRCDDBGatewayThreadHelper.o -MD -MP -MF ircDDBGateway/$(DEPDIR)/ircddbgateway-IRCDDBGatewayThreadHelper.Tpo -c -o ircDDBGateway/ircddbgateway-IRCDDBGatewayThreadHelper.o `test -f 'ircDDBGateway/IRCDDBGatewayThreadHelper.cpp' || echo '$(srcdir)/'`ircDDBGateway/IRCDDBGatewayThreadHelper.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ircDDBGateway/$(DEPDIR)/ircddbgateway-IRCDDBGatewayThreadHelper.Tpo ircDDBGateway/$(DEPDIR)/ircddbgateway-IRCDDBGatewayThreadHelper.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ircDDBGateway/IRCDDBGatewayThreadHelper.cpp' object='ircDDBGateway/ircddbgateway-IRCDDBGatewayThreadHelper.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ircddbgateway_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ircDDBGateway/ircddbgateway-IRCDDBGatewayThreadHelper.o `test -f 'ircDDBGateway/IRCDDBGatewayThreadHelper.cpp' || echo '$(srcdir)/'`ircDDBGateway/IRCDDBGatewayThreadHelper.cpp
-
-ircDDBGateway/ircddbgateway-IRCDDBGatewayThreadHelper.obj: ircDDBGateway/IRCDDBGatewayThreadHelper.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ircddbgateway_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ircDDBGateway/ircddbgateway-IRCDDBGatewayThreadHelper.obj -MD -MP -MF ircDDBGateway/$(DEPDIR)/ircddbgateway-IRCDDBGatewayThreadHelper.Tpo -c -o ircDDBGateway/ircddbgateway-IRCDDBGatewayThreadHelper.obj `if test -f 'ircDDBGateway/IRCDDBGatewayThreadHelper.cpp'; then $(CYGPATH_W) 'ircDDBGateway/IRCDDBGatewayThreadHelper.cpp'; else $(CYGPATH_W) '$(srcdir)/ircDDBGateway/IRCDDBGatewayThreadHelper.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ircDDBGateway/$(DEPDIR)/ircddbgateway-IRCDDBGatewayThreadHelper.Tpo ircDDBGateway/$(DEPDIR)/ircddbgateway-IRCDDBGatewayThreadHelper.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ircDDBGateway/IRCDDBGatewayThreadHelper.cpp' object='ircDDBGateway/ircddbgateway-IRCDDBGatewayThreadHelper.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ircddbgateway_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ircDDBGateway/ircddbgateway-IRCDDBGatewayThreadHelper.obj `if test -f 'ircDDBGateway/IRCDDBGatewayThreadHelper.cpp'; then $(CYGPATH_W) 'ircDDBGateway/IRCDDBGatewayThreadHelper.cpp'; else $(CYGPATH_W) '$(srcdir)/ircDDBGateway/IRCDDBGatewayThreadHelper.cpp'; fi`
-
 ircDDBGateway/ircddbgateway-IRCDDBGatewayStatusData.o: ircDDBGateway/IRCDDBGatewayStatusData.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ircddbgateway_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ircDDBGateway/ircddbgateway-IRCDDBGatewayStatusData.o -MD -MP -MF ircDDBGateway/$(DEPDIR)/ircddbgateway-IRCDDBGatewayStatusData.Tpo -c -o ircDDBGateway/ircddbgateway-IRCDDBGatewayStatusData.o `test -f 'ircDDBGateway/IRCDDBGatewayStatusData.cpp' || echo '$(srcdir)/'`ircDDBGateway/IRCDDBGatewayStatusData.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ircDDBGateway/$(DEPDIR)/ircddbgateway-IRCDDBGatewayStatusData.Tpo ircDDBGateway/$(DEPDIR)/ircddbgateway-IRCDDBGatewayStatusData.Po
@@ -3363,20 +3336,6 @@ ircDDBGateway/ircddbgatewayd-IRCDDBGatewayThread.obj: ircDDBGateway/IRCDDBGatewa
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ircDDBGateway/IRCDDBGatewayThread.cpp' object='ircDDBGateway/ircddbgatewayd-IRCDDBGatewayThread.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ircddbgatewayd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ircDDBGateway/ircddbgatewayd-IRCDDBGatewayThread.obj `if test -f 'ircDDBGateway/IRCDDBGatewayThread.cpp'; then $(CYGPATH_W) 'ircDDBGateway/IRCDDBGatewayThread.cpp'; else $(CYGPATH_W) '$(srcdir)/ircDDBGateway/IRCDDBGatewayThread.cpp'; fi`
-
-ircDDBGateway/ircddbgatewayd-IRCDDBGatewayThreadHelper.o: ircDDBGateway/IRCDDBGatewayThreadHelper.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ircddbgatewayd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ircDDBGateway/ircddbgatewayd-IRCDDBGatewayThreadHelper.o -MD -MP -MF ircDDBGateway/$(DEPDIR)/ircddbgatewayd-IRCDDBGatewayThreadHelper.Tpo -c -o ircDDBGateway/ircddbgatewayd-IRCDDBGatewayThreadHelper.o `test -f 'ircDDBGateway/IRCDDBGatewayThreadHelper.cpp' || echo '$(srcdir)/'`ircDDBGateway/IRCDDBGatewayThreadHelper.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ircDDBGateway/$(DEPDIR)/ircddbgatewayd-IRCDDBGatewayThreadHelper.Tpo ircDDBGateway/$(DEPDIR)/ircddbgatewayd-IRCDDBGatewayThreadHelper.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ircDDBGateway/IRCDDBGatewayThreadHelper.cpp' object='ircDDBGateway/ircddbgatewayd-IRCDDBGatewayThreadHelper.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ircddbgatewayd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ircDDBGateway/ircddbgatewayd-IRCDDBGatewayThreadHelper.o `test -f 'ircDDBGateway/IRCDDBGatewayThreadHelper.cpp' || echo '$(srcdir)/'`ircDDBGateway/IRCDDBGatewayThreadHelper.cpp
-
-ircDDBGateway/ircddbgatewayd-IRCDDBGatewayThreadHelper.obj: ircDDBGateway/IRCDDBGatewayThreadHelper.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ircddbgatewayd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ircDDBGateway/ircddbgatewayd-IRCDDBGatewayThreadHelper.obj -MD -MP -MF ircDDBGateway/$(DEPDIR)/ircddbgatewayd-IRCDDBGatewayThreadHelper.Tpo -c -o ircDDBGateway/ircddbgatewayd-IRCDDBGatewayThreadHelper.obj `if test -f 'ircDDBGateway/IRCDDBGatewayThreadHelper.cpp'; then $(CYGPATH_W) 'ircDDBGateway/IRCDDBGatewayThreadHelper.cpp'; else $(CYGPATH_W) '$(srcdir)/ircDDBGateway/IRCDDBGatewayThreadHelper.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ircDDBGateway/$(DEPDIR)/ircddbgatewayd-IRCDDBGatewayThreadHelper.Tpo ircDDBGateway/$(DEPDIR)/ircddbgatewayd-IRCDDBGatewayThreadHelper.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ircDDBGateway/IRCDDBGatewayThreadHelper.cpp' object='ircDDBGateway/ircddbgatewayd-IRCDDBGatewayThreadHelper.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ircddbgatewayd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ircDDBGateway/ircddbgatewayd-IRCDDBGatewayThreadHelper.obj `if test -f 'ircDDBGateway/IRCDDBGatewayThreadHelper.cpp'; then $(CYGPATH_W) 'ircDDBGateway/IRCDDBGatewayThreadHelper.cpp'; else $(CYGPATH_W) '$(srcdir)/ircDDBGateway/IRCDDBGatewayThreadHelper.cpp'; fi`
 
 ircDDBGateway/ircddbgatewayd-IRCDDBGatewayLogRedirect.o: ircDDBGateway/IRCDDBGatewayLogRedirect.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(ircddbgatewayd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ircDDBGateway/ircddbgatewayd-IRCDDBGatewayLogRedirect.o -MD -MP -MF ircDDBGateway/$(DEPDIR)/ircddbgatewayd-IRCDDBGatewayLogRedirect.Tpo -c -o ircDDBGateway/ircddbgatewayd-IRCDDBGatewayLogRedirect.o `test -f 'ircDDBGateway/IRCDDBGatewayLogRedirect.cpp' || echo '$(srcdir)/'`ircDDBGateway/IRCDDBGatewayLogRedirect.cpp

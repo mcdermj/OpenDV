@@ -146,9 +146,9 @@ void *CReflectorLookupThread::Entry() {
 
 
 CIRCDDBGatewayThread::CIRCDDBGatewayThread(const wxString& logDir, const wxString& name) :
+wxThread(wxTHREAD_JOINABLE),
 m_logDir(logDir),
 m_name(name),
-m_killed(false),
 m_stopped(true),
 m_gatewayType(GT_REPEATER),
 m_gatewayCallsign(),
@@ -209,7 +209,7 @@ m_restrictList(NULL)
 
 CIRCDDBGatewayThread::~CIRCDDBGatewayThread()
 {
-	CHeaderData::finalise();
+ 	CHeaderData::finalise();
 	CG2Handler::finalise();
 	CDExtraHandler::finalise();
 	CDPlusHandler::finalise();
@@ -220,7 +220,7 @@ CIRCDDBGatewayThread::~CIRCDDBGatewayThread()
 	CAudioUnit::finalise();
 }
 
-void CIRCDDBGatewayThread::run()
+void *CIRCDDBGatewayThread::Entry()
 {
 	// Truncate the old Links.log file
 	wxString fullName = LINKS_BASE_NAME;
@@ -304,11 +304,11 @@ void CIRCDDBGatewayThread::run()
 	}
 
 	// Wait here until we have the essentials to run
-	while (!m_killed && (m_dextraPool == NULL || m_dplusPool == NULL || m_dcsPool == NULL || m_g2Handler == NULL || (m_icomRepeaterHandler == NULL && m_hbRepeaterHandler == NULL && m_dummyRepeaterHandler == NULL) || m_gatewayCallsign.IsEmpty()))
+	while (!TestDestroy() && (m_dextraPool == NULL || m_dplusPool == NULL || m_dcsPool == NULL || m_g2Handler == NULL || (m_icomRepeaterHandler == NULL && m_hbRepeaterHandler == NULL && m_dummyRepeaterHandler == NULL) || m_gatewayCallsign.IsEmpty()))
 		::wxMilliSleep(500UL);		// 1/2 sec
 
-	if (m_killed)
-		return;
+	if (TestDestroy())
+		return NULL;
 
 	m_stopped = false;
 
@@ -424,7 +424,7 @@ void CIRCDDBGatewayThread::run()
 	CCallsignServer* server = NULL;
 	if (m_dextraEnabled || m_dcsEnabled) {
 		server = new CCallsignServer(m_gatewayCallsign, m_gatewayAddress, &m_cache);
-		server->start();
+		server->Run();
 	}
 
 	wxStopWatch stopWatch;
@@ -433,7 +433,7 @@ void CIRCDDBGatewayThread::run()
 	m_statusTimer2.start();
 
 	try {
-		while (!m_killed) {
+		while (!TestDestroy()) {
 			if (m_icomRepeaterHandler != NULL)
 				processRepeater(m_icomRepeaterHandler);
 
@@ -518,7 +518,7 @@ void CIRCDDBGatewayThread::run()
 		CDDHandler::finalise();
 
 	if (server != NULL)
-		server->stop();
+		server->Delete();
 
 	m_dextraPool->close();
 	delete m_dextraPool;
@@ -561,11 +561,8 @@ void CIRCDDBGatewayThread::run()
 		headerLogger->close();
 		delete headerLogger;
 	}
-}
 
-void CIRCDDBGatewayThread::kill()
-{
-	m_killed = true;
+	return NULL;
 }
 
 void CIRCDDBGatewayThread::setGateway(GATEWAY_TYPE gatewayType, const wxString& gatewayCallsign, const wxString& gatewayAddress)

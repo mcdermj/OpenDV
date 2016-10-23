@@ -19,7 +19,7 @@
 #ifndef	IRCDDBGatewayApp_H
 #define	IRCDDBGatewayApp_H
 
-#include "IRCDDBGatewayThreadHelper.h"
+#include "IRCDDBGatewayThread.h"
 #include "IRCDDBGatewayStatusData.h"
 #include "IRCDDBGatewayConfig.h"
 #if (wxUSE_GUI == 1)
@@ -54,18 +54,18 @@ public:
 	virtual void setPosition(int x, int y);
 
 private:
-	wxString                    m_name;
-	bool                        m_nolog;
-	bool                        m_gui;
-	wxString                    m_logDir;
-	wxString                    m_confDir;
+	wxString			m_name;
+	bool				m_nolog;
+	bool				m_gui;
+	wxString			m_logDir;
+	wxString			m_confDir;
 #if (wxUSE_GUI == 1)
-	CIRCDDBGatewayFrame*        m_frame;
+	CIRCDDBGatewayFrame*		m_frame;
 #endif
-	CIRCDDBGatewayThreadHelper* m_thread;
-	CIRCDDBGatewayConfig*       m_config;
-	wxSingleInstanceChecker*    m_checker;
-	wxLogChain*                 m_logChain;
+	CIRCDDBGatewayThread*		m_thread;
+	CIRCDDBGatewayConfig*		m_config;
+	wxSingleInstanceChecker*	m_checker;
+	wxLogChain*			m_logChain;
 
 	void createThread();
 };

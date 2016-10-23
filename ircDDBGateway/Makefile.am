@@ -135,7 +135,6 @@ ircddbgatewayd_SOURCES = \
 	ircDDBGateway/IRCDDBGatewayApp.cpp \
 	ircDDBGateway/IRCDDBGatewayStatusData.cpp \
 	ircDDBGateway/IRCDDBGatewayThread.cpp \
-	ircDDBGateway/IRCDDBGatewayThreadHelper.cpp \
 	ircDDBGateway/IRCDDBGatewayLogRedirect.cpp
 ircddbgatewayd_LDADD = $(BASE_WX_LIBS) libCommon.a libircDDB.a
 ircddbgatewayd_CPPFLAGS = -ICommon -IircDDB $(BASE_WX_CPPFLAGS)
@@ -237,7 +236,6 @@ ircddbgateway_SOURCES = \
 	ircDDBGateway/IRCDDBGatewayApp.cpp \
     ircDDBGateway/IRCDDBGatewayFrame.cpp \
     ircDDBGateway/IRCDDBGatewayLogRedirect.cpp \
-    ircDDBGateway/IRCDDBGatewayThreadHelper.cpp \
     ircDDBGateway/IRCDDBGatewayStatusData.cpp \
 	ircDDBGateway/IRCDDBGatewayThread.cpp
 ircddbgateway_LDADD = $(GUI_WX_LIBS) libCommon.a libircDDB.a

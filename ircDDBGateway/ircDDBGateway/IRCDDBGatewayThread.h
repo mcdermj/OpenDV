@@ -38,7 +38,7 @@
 
 #include <wx/wx.h>
 
-class CIRCDDBGatewayThread {
+class CIRCDDBGatewayThread : public wxThread {
 	friend class CReflectorLookupThread;
 
 public:
@@ -75,59 +75,57 @@ public:
 
 	virtual CIRCDDBGatewayStatusData* getStatus() const;
 
-	virtual void run();
-	virtual void kill();
+	virtual void *Entry();
 
 private:
-	wxString                  m_logDir;
-	wxString                  m_name;
-	bool                      m_killed;
-	bool                      m_stopped;
-	GATEWAY_TYPE              m_gatewayType;
-	wxString                  m_gatewayCallsign;
-	wxString                  m_gatewayAddress;
-	CIcomRepeaterProtocolHandler*  m_icomRepeaterHandler;
-	CHBRepeaterProtocolHandler*    m_hbRepeaterHandler;
-	CDummyRepeaterProtocolHandler* m_dummyRepeaterHandler;
-	CDExtraProtocolHandlerPool*    m_dextraPool;
-	CDPlusProtocolHandlerPool*     m_dplusPool;
-	CDCSProtocolHandlerPool*       m_dcsPool;
-	CG2ProtocolHandler*       m_g2Handler;
-	CAPRSWriter*              m_aprsWriter;
-	CIRCDDB*                  m_irc;
-	CCacheManager             m_cache;
-	TEXT_LANG                 m_language;
-	bool                      m_dextraEnabled;
-	unsigned int              m_dextraMaxDongles;
-	bool                      m_dplusEnabled;
-	unsigned int              m_dplusMaxDongles;
-	wxString                  m_dplusLogin;
-	bool                      m_dcsEnabled;
-	bool                      m_ccsEnabled;
-	wxString                  m_ccsHost;
-	bool                      m_infoEnabled;
-	bool                      m_echoEnabled;
-	bool                      m_dtmfEnabled;
-	bool                      m_logEnabled;
-	bool                      m_ddModeEnabled;
-	IRCDDB_STATUS             m_lastStatus;
-	CTimer                    m_statusTimer1;
-	CTimer                    m_statusTimer2;
-	bool                      m_remoteEnabled;
-	wxString                  m_remotePassword;
-	unsigned int              m_remotePort;
-	CRemoteHandler*           m_remote;
-	CTimer                    m_statusFileTimer;
-	wxString                  m_status1;
-	wxString                  m_status2;
-	wxString                  m_status3;
-	wxString                  m_status4;
-	wxString                  m_status5;
-	double                    m_latitude;
-	double                    m_longitude;
-	CCallsignList*            m_whiteList;
-	CCallsignList*            m_blackList;
-	CCallsignList*            m_restrictList;
+	wxString                  	m_logDir;
+	wxString                 	m_name;
+	bool                      	m_stopped;
+	GATEWAY_TYPE              	m_gatewayType;
+	wxString                  	m_gatewayCallsign;
+	wxString                  	m_gatewayAddress;
+	CIcomRepeaterProtocolHandler*	m_icomRepeaterHandler;
+	CHBRepeaterProtocolHandler*	m_hbRepeaterHandler;
+	CDummyRepeaterProtocolHandler*	m_dummyRepeaterHandler;
+	CDExtraProtocolHandlerPool*	m_dextraPool;
+	CDPlusProtocolHandlerPool*	m_dplusPool;
+	CDCSProtocolHandlerPool*	m_dcsPool;
+	CG2ProtocolHandler*		m_g2Handler;
+	CAPRSWriter*			m_aprsWriter;
+	CIRCDDB*			m_irc;
+	CCacheManager			m_cache;
+	TEXT_LANG			m_language;
+	bool				m_dextraEnabled;
+	unsigned int			m_dextraMaxDongles;
+	bool				m_dplusEnabled;
+	unsigned int			m_dplusMaxDongles;
+	wxString			m_dplusLogin;
+	bool				m_dcsEnabled;
+	bool				m_ccsEnabled;
+	wxString			m_ccsHost;
+	bool				m_infoEnabled;
+	bool				m_echoEnabled;
+	bool				m_dtmfEnabled;
+	bool				m_logEnabled;
+	bool				m_ddModeEnabled;
+	IRCDDB_STATUS			m_lastStatus;
+	CTimer				m_statusTimer1;
+	CTimer				m_statusTimer2;
+	bool				m_remoteEnabled;
+	wxString			m_remotePassword;
+	unsigned int			m_remotePort;
+	CRemoteHandler*			m_remote;
+	CTimer				m_statusFileTimer;
+	wxString			m_status1;
+	wxString			m_status2;
+	wxString			m_status3;
+	wxString			m_status4;
+	wxString			m_status5;
+	double				m_latitude;
+	double				m_longitude;
+	CCallsignList*			m_whiteList;
+	CCallsignList*			m_blackList;
+	CCallsignList*			m_restrictList;
 
 	void processIrcDDB();
 	void processRepeater(IRepeaterProtocolHandler* handler);
