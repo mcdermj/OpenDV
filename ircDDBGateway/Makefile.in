@@ -92,7 +92,8 @@ sbin_PROGRAMS = ircddbgatewayd$(EXEEXT) starnetserverd$(EXEEXT) \
 	timeserverd$(EXEEXT)
 bin_PROGRAMS = texttransmit$(EXEEXT) voicetransmit$(EXEEXT) \
 	aprstransmit$(EXEEXT) remotecontrold$(EXEEXT) $(am__EXEEXT_1)
-@WITH_GUI_TRUE@am__append_1 = ircddbgateway ircddbgatewayconfig remotecontrol starnetserver \
+@WITH_GUI_TRUE@am__append_1 = libGUICommon.a
+@WITH_GUI_TRUE@am__append_2 = ircddbgateway ircddbgatewayconfig remotecontrol starnetserver \
 @WITH_GUI_TRUE@                timercontrol timeserver
 
 subdir = .
@@ -647,6 +648,7 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -677,7 +679,9 @@ TIMESERVER_COMMON = \
 	TimeServer/TimeServerConfig.cpp \
 	TimeServer/TimeServerThread.cpp
 
-noinst_LIBRARIES = libCommon.a libircDDB.a libGUICommon.a
+
+#noinst_LIBRARIES = libCommon.a libircDDB.a libGUICommon.a
+noinst_LIBRARIES = libCommon.a libircDDB.a $(am__append_1)
 libCommon_a_SOURCES = \
 	Common/AMBEData.cpp \
 	Common/AnnouncementUnit.cpp \

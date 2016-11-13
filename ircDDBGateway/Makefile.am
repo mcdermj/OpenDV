@@ -29,7 +29,8 @@ TIMESERVER_COMMON = \
 	TimeServer/TimeServerConfig.cpp \
 	TimeServer/TimeServerThread.cpp
 
-noinst_LIBRARIES = libCommon.a libircDDB.a libGUICommon.a
+#noinst_LIBRARIES = libCommon.a libircDDB.a libGUICommon.a
+noinst_LIBRARIES = libCommon.a libircDDB.a
 
 libCommon_a_SOURCES = \
 	Common/AMBEData.cpp \
@@ -228,6 +229,8 @@ pkgdata_DATA = \
 	Data/TIME_se_SE.indx
 
 if WITH_GUI
+noinst_LIBRARIES +=  libGUICommon.a
+
 bin_PROGRAMS += ircddbgateway ircddbgatewayconfig remotecontrol starnetserver \
                 timercontrol timeserver
 
